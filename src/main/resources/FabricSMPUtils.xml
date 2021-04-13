@@ -1,0 +1,49 @@
+<!--
+It's recommended to use a syntax highlighting text editor for editing this file.
+I suggest Sublime Text 3, VSCode or Notepad++
+It makes it easier to overview the config & comment out lines (usually ctrl+/ or ctrl+k)
+
+Deeper look into the config at https://github.com/CodedSakura/FabricSMPUtils/wiki
+-->
+<FabricSMPUtils>
+    <Teleportation boss-bar="yellow" action-bar="disabled" global-cooldown="false" allow-back="true">
+        <Locale entry="header-text">Teleporting...</Locale>
+
+        <TPA stand-still="5" cooldown="30" timeout="60" who-teleported="WhoInitiated"/>
+
+        <RTP stand-still="5" cooldown="120" action-bar="enabled" allow-back="false">
+            <Locale entry="action-bar-text">Randomly teleporting you in {$remaining} seconds!</Locale>
+        </RTP>
+
+        <Spawn stand-still="3" cooldown="120" boss-bar="green"/>
+
+        <Warps stand-still="3" cooldown="30"/>
+
+        <Back stand-still="5" cooldown="120" cost="$seconds_since_teleport > 30">
+            <Experience levels="1"/>
+        </Back>
+
+        <Homes starting="1" max="5" stand-still="3" cooldown="30" allow-back="$home_count > 2">
+            <Stage to-get="2">
+                <Items count="1" consume="false">minecraft:iron_pickaxe</Items>
+                <Experience levels="5" consume="true"/>
+                <Advancement>minecraft:adventure/kill_a_mob</Advancement>
+            </Stage>
+            <AutoStage starting-with="3">
+                <Items count="3 * $home_count" consume="yes">minecraft:diamond</Items>
+                <Experience levels="10" consume="true"/>
+            </AutoStage>
+            <AutoStage starting-with="4">
+                <Items count="1 * ($home_count - 3)" consume="false">minecraft:nether_star</Items>
+            </AutoStage>
+        </Homes>
+    </Teleportation>
+
+    <PVP default-state="off" stand-still="3" cooldown="20"/>
+
+    <Bottle max-bottle-levels="50" min-bottle="500" cooldown="0"/>
+
+    <AFK time="300"/>
+
+    <NoMobGrief wither="on"/>
+</FabricSMPUtils>

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "fabric-smp-utils",
+  "version": "${version}",
+  "name": "FabricSMPUtils",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "website": "http://mods.codedsakura.eu",
+    "homepage": "http://codedsakura.eu",
+    "sources": "https://github.com/CodedSakura/FabricSMPUtils",
+    "repo": "https://github.com/CodedSakura/FabricSMPUtils",
+    "issues": "https://github.com/CodedSakura/FabricSMPUtils/issues"
+  },
+  "license": "ISC",
+  "icon": "assets/FabricSMPUtils/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "eu.codedsakura.fabricsmputils.FabricSMPUtils"
+    ],
+    "cardinal-components": [
+      "eu.codedsakura.fabricsmputils.SMPUtilCardinalComponents"
+    ]
+  },
+  "mixins": [
+    "FabricSMPUtils.mixins.json"
+  ],
+  "custom": {
+    "cardinal-components": [
+      "fabric-smp-utils:homes",
+      "fabric-smp-utils:pvp",
+      "fabric-smp-utils:warps"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.10.6+build.214",
+    "fabric": "*",
+    "minecraft": "^1.16.2"
+  }
+}

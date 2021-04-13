@@ -1,0 +1,105 @@
+{
+  "teleportation": {
+    "boss-bar": "yellow",
+    "action=bar": "disabled",
+    "global-cooldown": false,
+    "allow-back": true,
+    "locales": [{"entry": "header-text", "text": "Teleporting..."}],
+    "TPA": {
+      "stand-still": 5,
+      "cooldown": 30,
+      "timeout": 60
+    },
+    "RTP": {
+      "stand-still": 5,
+      "cooldown": 120,
+      "action-bar": true,
+      "allow-back": false,
+      "locales": [{
+        "entry": "action-bar-text",
+        "text": "Randomly teleporting you in {$remaining} seconds!"
+      }]
+    },
+    "spawn": {
+      "stand-still": 3,
+      "cooldown": 120,
+      "boss-bar": "green"
+    },
+    "warps": {
+      "stand-still": 3,
+      "cooldown": 30,
+      "permission-level": 2
+    },
+    "homes": {
+      "starting": 1,
+      "max": 5,
+      "stand-still": 3,
+      "cooldown": 30,
+      "allow-back": "$home_count > 2",
+      "stages": [
+        {
+          "get": 2,
+          "requirements": [
+            {
+              "type": "items",
+              "count": 1,
+              "consume": false,
+              "item": "minecraft:iron_pickaxe"
+            },
+            {
+              "type": "experience",
+              "levels": 5,
+              "consume": true
+            },
+            {
+              "type": "advancement",
+              "advancement": "minecraft:adventure/kill_a_mob"
+            }
+          ]
+        }
+      ],
+      "autostages": [
+        {
+          "after": 2,
+          "requirements": [
+            {
+              "type": "items",
+              "count": "3 * $home_count",
+              "consume": true,
+              "item": "minecraft:diamond"
+            },
+            {
+              "type": "experience",
+              "levels": 10,
+              "consume": true
+            }
+          ]
+        },
+        {
+          "after": 3,
+          "requirements": [
+            {
+              "type": "items",
+              "count": "1 * ($home_count - 3)",
+              "consume": false,
+              "item": "minecraft:nether_star"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pvp": {
+    "default-state": "off",
+    "stand-still": 3,
+    "cooldown": 20
+  },
+  "bottle": {
+    "max-bottle": "50L",
+    "min-bottle": "500",
+    "cooldown": 0
+  },
+  "AFK": {
+    "time": 300
+  }
+}
