@@ -12,6 +12,8 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.UUID;
 
+import static eu.codedsakura.common.TextUtils.valueRepr;
+
 public class Warp {
     public double x, y, z;
     public float yaw, pitch;
@@ -35,24 +37,6 @@ public class Warp {
 
     public Warp(Vec3d pos, Vec2f rot, String name, UUID owner) {
         this(pos.x, pos.y, pos.z, rot.x, rot.y, name, owner);
-    }
-
-    private static MutableText valueRepr(String name, Text value) {
-        if (value.getStyle().getColor() == null)
-            return new LiteralText(name + ": ").formatted(Formatting.RESET).append(value.copy().formatted(Formatting.GOLD));
-        return new LiteralText(name + ": ").formatted(Formatting.RESET).append(value);
-    }
-
-    private static MutableText valueRepr(String name, String value) {
-        return valueRepr(name, new LiteralText(value).formatted(Formatting.GOLD));
-    }
-
-    private static MutableText valueRepr(String name, double value) {
-        return valueRepr(name, String.format("%.2f", value));
-    }
-
-    private static MutableText valueRepr(String name, float value) {
-        return valueRepr(name, String.format("%.2f", value));
     }
 
     public MutableText toText(ServerWorld world) {

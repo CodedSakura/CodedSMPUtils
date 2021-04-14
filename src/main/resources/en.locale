@@ -1,4 +1,4 @@
-# suppress inspection "UnusedProperty" for whole file
+# language=properties# suppress inspection "UnusedProperty" for whole file
 teleportation.boss-bar=
 teleportation.action-bar-text=[light_purple]Stand still for {$remaining} more seconds
 
@@ -47,6 +47,12 @@ teleportation.warps.remove.success=[yellow]Warp [gold]{$name}[gold] successfully
 teleportation.warps.list.in-dimension.header=[light_purple]In [aqua]{$dimension}[/aqua]:
 teleportation.warps.list.in-dimension.entry=  [gold][hover:show_text:'[italic]Click to teleport!\n{$details}'][click:run_command:/warp "{$name}"]{$name}
 teleportation.warps.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
+teleportation.warps.as-text=Name: [gold]{$name}[/gold]\n\
+  Author:[gold]{$author}[/gold]\n\
+  X: [gold]{$x}[/gold]; Y: [gold]{$y}[/gold]; Z: [gold]{$z}[/gold]\n\
+  Yaw: [gold]{$yaw}[/gold]; Pitch: [gold]{$pitch}[/gold]\n\
+  In: [gold]{$dimension}[/gold]\n\
+  ID: [gold]{$id-trunc}[/gold]
 
 teleportation.back=
 
@@ -60,6 +66,10 @@ teleportation.homes.remove.error=[red]Something went wrong removing the home!
 teleportation.homes.remove.success=[light_purple]Home [gold]{$name}[/gold] added successfully!
 teleportation.homes.remove.could-not=[red]Could not remove home!
 teleportation.homes.list.click=Click to teleport.
+teleportation.homes.as-text=Name: [gold]{$name}[/gold]\n\
+  X: [gold]{$x}[/gold]; Y: [gold]{$y}[/gold]; Z: [gold]{$z}[/gold]\n\
+  Yaw: [gold]{$yaw}[/gold]; Pitch: [gold]{$pitch}[/gold]\n\
+  In: [gold]{$dimension}[/gold]
 
 pvp.state.on=enabled
 pvp.state.off=disabled

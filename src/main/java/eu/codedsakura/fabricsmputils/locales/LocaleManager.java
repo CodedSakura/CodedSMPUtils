@@ -4,11 +4,11 @@ import eu.codedsakura.common.expression.Expression;
 import eu.codedsakura.fabricsmputils.FabricSMPUtils;
 import eu.codedsakura.fabricsmputils.config.FabricSMPUtilsConfig;
 import eu.codedsakura.fabricsmputils.config.elements.Locale;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.text.Text;
 
 import javax.script.ScriptException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,13 +20,23 @@ public class LocaleManager {
     private final Properties props = new Properties();
     private final Properties overrides = new Properties();
 
-    public LocaleManager(String resourceName) throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName);
-        props.load(inputStream);
-    }
+    public LocaleManager() {}
 
-    public void loadFromConfig(FabricSMPUtilsConfig config) {
+    public void loadFromConfig(FabricSMPUtilsConfig config) throws IOException {
+        props.clear();
         overrides.clear();
+
+        InputStream inputStream;
+        if (config.locale.matches("^[a-z]{2,3}$")) {
+            inputStream = getClass().getClassLoader().getResourceAsStream(config.locale + ".locale");
+        } else {
+            File file = FabricLoader.getInstance().getConfigDir().resolve(config.locale).toFile();
+            if (!file.exists()) {
+                throw new FileNotFoundException(config.locale);
+            }
+            inputStream = new FileInputStream(file);
+        }
+        props.load(inputStream);
 
         if (config.teleportation != null) {
             for (Locale locale : config.teleportation.locales)
@@ -103,12 +113,32 @@ public class LocaleManager {
         return getText(entry, new HashMap<>());
     }
 
+    public Text getText(String entry, String fallback) {
+        return getText(entry, fallback, new HashMap<>());
+    }
+
     public Text getText(String entry, Map<String, ?> variables) {
+        return getText(entry, null, variables);
+    }
+
+    public Text getText(String entry, String fallback, Map<String, ?> variables) {
         String text = overrides.getProperty(entry);
-        if (text == null) text = props.getProperty(entry);
+        if (text == null)
+            text = props.getProperty(entry);
+
+        if (fallback == null && text == null) {
+            logger.error("Locale '" + entry + "' not found!");
+            return Text.of("<Locale error, please report to an admin>");
+        } else if (text == null) {
+            text = overrides.getProperty(fallback);
+        }
+
         if (text == null) {
-            logger.error("Locale " + entry + " not found!");
-            return null;
+            text = props.getProperty(fallback);
+        }
+        if (text == null) {
+            logger.error("Fallback Locale '" + entry + "' not found!");
+            return Text.of("<Locale error, please report to an admin>");
         }
 
         Compound[] compounds = findAllExpressions(text);
