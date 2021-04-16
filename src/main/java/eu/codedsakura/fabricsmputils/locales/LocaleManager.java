@@ -80,9 +80,8 @@ public class LocaleManager {
                 overrides.put("afk." + locale.entry, locale.text);
     }
 
-    private Compound[] findAllExpressions(String value) {
+    private Compound findNextExpressions(String value) {
         int bracketCounter = 0;
-        ArrayList<Compound> out = new ArrayList<>();
         Compound current = null;
 
         char[] charArray = value.toCharArray();
@@ -98,30 +97,29 @@ public class LocaleManager {
                 assert current != null;
                 if (--bracketCounter == 0) {
                     current.end = i+1;
-                    out.add(current);
+                    return current;
                 }
             } else if (bracketCounter > 0) {
-                assert current != null;
                 current.data += c;
             }
         }
 
-        return out.toArray(new Compound[] {});
+        return null;
     }
 
-    public Text getText(String entry) {
-        return getText(entry, new HashMap<>());
+    public Text get(String entry) {
+        return get(entry, new HashMap<>());
     }
 
-    public Text getText(String entry, String fallback) {
-        return getText(entry, fallback, new HashMap<>());
+    public Text get(String entry, String fallback) {
+        return get(entry, fallback, new HashMap<>());
     }
 
-    public Text getText(String entry, Map<String, ?> variables) {
-        return getText(entry, null, variables);
+    public Text get(String entry, Map<String, ?> variables) {
+        return get(entry, null, variables);
     }
 
-    public Text getText(String entry, String fallback, Map<String, ?> variables) {
+    public Text get(String entry, String fallback, Map<String, ?> variables) {
         String text = overrides.getProperty(entry);
         if (text == null)
             text = props.getProperty(entry);
@@ -141,11 +139,10 @@ public class LocaleManager {
             return Text.of("<Locale error, please report to an admin>");
         }
 
-        Compound[] compounds = findAllExpressions(text);
-
         StringBuilder sb = new StringBuilder(text);
         try {
-            for (Compound compound : compounds) {
+            Compound compound;
+            while ((compound = findNextExpressions(sb.toString())) != null) {
                 sb.delete(compound.start, compound.end);
                 sb.insert(compound.start, compound.getValue(variables));
             }

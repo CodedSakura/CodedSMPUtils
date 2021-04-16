@@ -2,10 +2,10 @@ package eu.codedsakura.fabricsmputils.modules.pvp;
 
 import net.minecraft.nbt.CompoundTag;
 
-import static eu.codedsakura.fabricsmputils.FabricSMPUtils.config;
+import static eu.codedsakura.fabricsmputils.FabricSMPUtils.CONFIG;
 
 public class PvPComponent implements IPvPComponent {
-    private boolean isOn = config.pvp != null && config.pvp.defaultState;
+    private boolean isOn = CONFIG.pvp != null && CONFIG.pvp.defaultState;
 
     @Override
     public boolean isOn() {

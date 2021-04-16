@@ -21,7 +21,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static eu.codedsakura.fabricsmputils.FabricSMPUtils.config;
+import static eu.codedsakura.fabricsmputils.FabricSMPUtils.CONFIG;
+import static eu.codedsakura.fabricsmputils.FabricSMPUtils.L;
 import static eu.codedsakura.fabricsmputils.SMPUtilCardinalComponents.HOME_DATA;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -34,27 +35,27 @@ public class Homes {
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
             dispatcher.register(literal("home")
-                    .requires(source -> config.teleportation != null && config.teleportation.homes != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.homes", true))
                     .executes(ctx -> homeInit(ctx, null))
                     .then(argument("name", StringArgumentType.greedyString()).suggests(this::getHomeSuggestions)
                             .executes(ctx -> homeInit(ctx, StringArgumentType.getString(ctx, "name")))));
 
             dispatcher.register(literal("sethome")
-                    .requires(source -> config.teleportation != null && config.teleportation.homes != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.homes.edit", true))
                     .executes(ctx -> homeSet(ctx, null))
                     .then(argument("name", StringArgumentType.greedyString())
                             .executes(ctx -> homeSet(ctx, StringArgumentType.getString(ctx, "name")))));
 
             dispatcher.register(literal("delhome")
-                    .requires(source -> config.teleportation != null && config.teleportation.homes != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.homes.edit", true))
                             .then(argument("name", StringArgumentType.greedyString()).suggests(this::getHomeSuggestions)
                                     .executes(ctx -> homeDel(ctx, StringArgumentType.getString(ctx, "name")))));
 
             dispatcher.register(literal("homes")
-                    .requires(source -> config.teleportation != null && config.teleportation.homes != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.homes", true))
                     .executes(this::homeList)
                     .then(literal("list")
@@ -74,8 +75,9 @@ public class Homes {
     private boolean checkCooldown(ServerPlayerEntity tFrom) {
         if (recentRequests.containsKey(tFrom.getUuid())) {
             long diff = Instant.now().getEpochSecond() - recentRequests.get(tFrom.getUuid());
-            if (diff < config.teleportation.homes.cooldown) {
-                tFrom.sendMessage(new TranslatableText("You cannot make teleport home for %s more seconds!", String.valueOf(config.teleportation.homes.cooldown - diff)).formatted(Formatting.RED), false);
+            if (diff < CONFIG.teleportation.homes.cooldown) {
+                tFrom.sendMessage(L.get("teleportation.homes.cooldown",
+                        new HashMap<String, Object>() {{ put("remaining", CONFIG.teleportation.homes.cooldown - diff); }}), false);
                 return true;
             }
         }
@@ -101,14 +103,14 @@ public class Homes {
                 .stream().filter(v -> v.getName().equals(finalName)).findFirst();
 
         if (!home.isPresent()) {
-            ctx.getSource().sendFeedback(new LiteralText("This home does not exist").formatted(Formatting.RED), false);
+            ctx.getSource().sendFeedback(L.get("teleportation.homes.not-exists"), false);
             return 0;
         }
 
         if (checkCooldown(player)) return 1;
 
         TeleportUtils.genericTeleport(
-                config.teleportation.homes.bossBar, config.teleportation.homes.actionBar, config.teleportation.homes.standStill,
+                "teleportation.homes", CONFIG.teleportation.homes.bossBar, CONFIG.teleportation.homes.actionBar, CONFIG.teleportation.homes.standStill,
                 player, () -> {
                     player.teleport(
                             ctx.getSource().getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, home.get().getDimID())),
@@ -123,8 +125,8 @@ public class Homes {
     int homeSet(CommandContext<ServerCommandSource> ctx, String name) throws CommandSyntaxException {
         if (name == null) name = "main";
 
-        if (HOME_DATA.get(ctx.getSource().getPlayer()).getHomes().size() >= config.teleportation.homes.starting) {
-            ctx.getSource().sendFeedback(new LiteralText("Home limit reached!").formatted(Formatting.RED), false);
+        if (HOME_DATA.get(ctx.getSource().getPlayer()).getHomes().size() >= CONFIG.teleportation.homes.starting) {
+            ctx.getSource().sendFeedback(L.get("teleportation.homes.limit"), false);
             return 1;
         }
 
@@ -140,15 +142,14 @@ public class Homes {
                     .stream().filter(v -> v.getName().equals(finalName)).findFirst();
 
             if (!home.isPresent()) {
-                ctx.getSource().sendFeedback(new LiteralText("Something went wrong adding the home!").formatted(Formatting.RED), true);
+                ctx.getSource().sendFeedback(L.get("teleportation.homes.add.error"), true);
                 return 1;
             }
 
-            ctx.getSource().sendFeedback(new TranslatableText("Home %s added successfully!",
-                    new LiteralText(name).styled(s -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, home.get().toText(ctx.getSource().getMinecraftServer())))
-                            .withColor(Formatting.GOLD))).formatted(Formatting.LIGHT_PURPLE), false);
+            ctx.getSource().sendFeedback(L.get("teleportation.homes.add.success",
+                    new HashMap<String, Object>() {{ put("name", finalName); }}), false);
         } else {
-            ctx.getSource().sendFeedback(new LiteralText("Couldn't add the home (probably already exists)!").formatted(Formatting.RED), false);
+            ctx.getSource().sendFeedback(L.get("teleportation.homes.add.could-not"), false);
             return 1;
         }
         return 1;
@@ -160,14 +161,14 @@ public class Homes {
                     .stream().filter(v -> v.getName().equals(name)).findFirst();
 
             if (home.isPresent()) {
-                ctx.getSource().sendFeedback(new LiteralText("Something went wrong removing the home!").formatted(Formatting.RED), true);
+                ctx.getSource().sendFeedback(L.get("teleportation.homes.remove.error"), true);
                 return 1;
             }
 
-            ctx.getSource().sendFeedback(new TranslatableText("Home %s deleted successfully!",
-                    new LiteralText(name).formatted(Formatting.GOLD)).formatted(Formatting.LIGHT_PURPLE), false);
+            ctx.getSource().sendFeedback(L.get("teleportation.homes.remove.success",
+                    new HashMap<String, Object>() {{ put("name", name); }}), false);
         } else {
-            ctx.getSource().sendFeedback(new LiteralText("Couldn't remove the home!").formatted(Formatting.RED), false);
+            ctx.getSource().sendFeedback(L.get("teleportation.homes.remove.could-not"), false);
             return 1;
         }
         return 1;
@@ -179,15 +180,14 @@ public class Homes {
     }
     int homeList(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity player) {
         List<HomeComponent> homes = HOME_DATA.get(player).getHomes();
-        List<Text> list = new ArrayList<>();
+        MutableText list = L.get("teleportation.homes.list.header",
+                new HashMap<String, Object>() {{
+                    put("count", homes.size());
+                    put("max", CONFIG.teleportation.homes.starting);
+        }}).shallowCopy();
         homes.stream().sorted((h1, h2) -> h1.getName().compareToIgnoreCase(h2.getName())).forEach(h ->
-                list.add(new LiteralText(h.getName()).styled(s ->
-                        s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/home " + h.getName()))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                        LiteralText.EMPTY.copy().append(new LiteralText("Click to teleport.\n").formatted(Formatting.ITALIC))
-                                                .append(h.toText(ctx.getSource().getMinecraftServer()))))
-                                .withColor(Formatting.GOLD))));
-        ctx.getSource().sendFeedback(new TranslatableText("%s/%s:\n", homes.size(), config.teleportation.homes.starting).append(TextUtils.join(list, new LiteralText(", "))), false);
+                list.append(L.get("teleportation.homes.list.entry", h.asArguments())));
+        ctx.getSource().sendFeedback(list, false);
         return 1;
     }
 }

@@ -14,5 +14,4 @@ public interface INamedDirectionalPointComponent {
     String getName();
     Vec3d getCoords();
     Identifier getDimID();
-    MutableText toText(MinecraftServer server);
 }

@@ -2,9 +2,9 @@ package eu.codedsakura.fabricsmputils.modules.tpa;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+
+import static eu.codedsakura.fabricsmputils.FabricSMPUtils.CONFIG;
 
 class TPARequest {
     ServerPlayerEntity tFrom;
@@ -71,5 +71,16 @@ class TPARequest {
         this.rFrom = this.tpaHere ? tTo : tFrom;
         this.rTo = this.tpaHere ? tFrom : tTo;
         assert tFrom != null && tTo != null;
+    }
+
+    public Map<String, ?> asArguments() {
+        return new HashMap<String, Object>() {{
+            put("req-to-name", Objects.requireNonNull(rTo.getName().asString()));
+            put("req-from-name", Objects.requireNonNull(rFrom.getName().asString()));
+            put("tp-to-name", Objects.requireNonNull(tTo.getName().asString()));
+            put("tp-from-name", Objects.requireNonNull(tFrom.getName().asString()));
+            put("is-tpa-here", tpaHere);
+            put("timeout-length", CONFIG.teleportation.tpa.timeout);
+        }};
     }
 }

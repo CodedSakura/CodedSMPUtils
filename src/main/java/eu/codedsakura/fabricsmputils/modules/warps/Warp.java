@@ -10,6 +10,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 import static eu.codedsakura.common.TextUtils.valueRepr;
@@ -39,15 +40,21 @@ public class Warp {
         this(pos.x, pos.y, pos.z, rot.x, rot.y, name, owner);
     }
 
-    public MutableText toText(ServerWorld world) {
+    public HashMap<String, ?> asArguments(ServerWorld world) {
         ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(this.owner);
-        Text ownerName = player == null ? new LiteralText("[unknown]") : player.getDisplayName();
-        return new TranslatableText("%s\n%s\n%s; %s; %s\n%s; %s\n%s\n%s",
-                valueRepr("Name", name), valueRepr("Made by", ownerName),
-                valueRepr("X", x), valueRepr("Y", y), valueRepr("Z", z),
-                valueRepr("Yaw", yaw), valueRepr("Pitch", pitch),
-                valueRepr("In", world.getRegistryKey().getValue().toString()),
-                valueRepr("ID", id.toString().substring(0, 21) + "..."));
+        return new HashMap<String, Object>() {{
+            put("name", name);
+            put("author", player == null ? "[unknown]" : player.getName().asString());
+            put("x", x);
+            put("y", y);
+            put("z", z);
+            put("yaw", yaw);
+            put("pitch", pitch);
+            put("owner-uuid", owner);
+            put("dimension", world.getRegistryKey().getValue().toString());
+            put("id", id.toString());
+            put("id-trunc", id.toString().substring(0, 21) + "...");
+        }};
     }
 
     @Override

@@ -19,9 +19,9 @@ import org.apache.logging.log4j.Logger;
 
 public class FabricSMPUtils implements ModInitializer {
     public static final Logger logger = LogManager.getLogger("FabricSMPUtils");
-    public static FabricSMPUtilsConfig config = null;
+    public static FabricSMPUtilsConfig CONFIG = null;
     public static MiniMessage miniMessage = null;
-    public static LocaleManager l = new LocaleManager();
+    public static LocaleManager L = new LocaleManager();
     public static FabricServerAudiences fsa = null;
 
     @Override
@@ -32,8 +32,8 @@ public class FabricSMPUtils implements ModInitializer {
 
         TeleportUtils.initialize();
         try {
-            config = new ConfigParser<>(FabricSMPUtilsConfig.class, FabricLoader.getInstance().getConfigDir()).read();
-            l.loadFromConfig(config);
+            CONFIG = new ConfigParser<>(FabricSMPUtilsConfig.class, FabricLoader.getInstance().getConfigDir()).read();
+            L.loadFromConfig(CONFIG);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -3,7 +3,6 @@ package eu.codedsakura.common.expression;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Expression<T> {
@@ -16,26 +15,24 @@ public abstract class Expression<T> {
         engine = mgr.getEngineByName("JavaScript");
     }
 
-    private Map<String, String> processVariables(Map<String, ?> variables) {
-        HashMap<String, String> out = new HashMap<>();
-        variables.forEach((s, o) -> {
-            String value = String.valueOf(o);
-            // https://stackoverflow.com/a/55592455/8672525
-            if (
-                    value.matches("^[+-]?(\\d+([.]\\d*)?([eE][+-]?\\d+)?|[.]\\d+([eE][+-]?\\d+)?)\n$") ||
-                    value.matches("^true|false$")) {
-                out.put(s, value);
-            } else {
-                out.put(s, '"' + value + '"');
-            }
-        });
-        return out;
+    private String processVariable(Object variable) {
+        String value = String.valueOf(variable);
+        // https://stackoverflow.com/a/55592455/8672525
+        if (
+                value.matches("^[+-]?(\\d+([.]\\d*)?([eE][+-]?\\d+)?|[.]\\d+([eE][+-]?\\d+)?)\n$") ||
+                value.matches("^true|false$")) {
+            return value;
+        } else {
+            return '"' + value + '"';
+        }
     }
 
     protected Object getRawValue(Map<String, ?> variables) throws ScriptException {
         final String[] finalData = {data};
-        processVariables(variables)
-                .forEach((k, v) -> finalData[0] = finalData[0].replaceAll("\\$" + k, v));
+
+        variables.entrySet().stream()
+                .filter(entry -> data.contains("$" + entry.getKey())) // make sure we're processing only the necessary variables
+                .forEach(entry -> finalData[0] = finalData[0].replaceAll("\\$" + entry.getKey() + "(?!\\w)", processVariable(entry.getValue())));
         return engine.eval(finalData[0]);
     }
 

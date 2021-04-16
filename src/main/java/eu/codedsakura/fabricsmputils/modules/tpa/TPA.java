@@ -23,7 +23,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static eu.codedsakura.fabricsmputils.FabricSMPUtils.config;
+import static eu.codedsakura.fabricsmputils.FabricSMPUtils.CONFIG;
+import static eu.codedsakura.fabricsmputils.FabricSMPUtils.L;
 import static net.minecraft.command.argument.EntityArgumentType.getPlayer;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -35,33 +36,33 @@ public class TPA {
     public void initialize() {
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
             dispatcher.register(literal("tpa")
-                    .requires(source -> config.teleportation != null && config.teleportation.tpa != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
                     .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
                             .executes(ctx -> tpaInit(ctx, getPlayer(ctx, "target")))));
 
             dispatcher.register(literal("tpahere")
-                    .requires(source -> config.teleportation != null && config.teleportation.tpa != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
                     .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
                             .executes(ctx -> tpaHere(ctx, getPlayer(ctx, "target")))));
 
             dispatcher.register(literal("tpaaccept")
-                    .requires(source -> config.teleportation != null && config.teleportation.tpa != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
                     .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
                             .executes(ctx -> tpaAccept(ctx, getPlayer(ctx, "target"))))
                     .executes(ctx -> tpaAccept(ctx, null)));
 
             dispatcher.register(literal("tpadeny")
-                    .requires(source -> config.teleportation != null && config.teleportation.tpa != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
                     .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
                             .executes(ctx -> tpaDeny(ctx, getPlayer(ctx, "target"))))
                     .executes(ctx -> tpaDeny(ctx, null)));
 
             dispatcher.register(literal("tpacancel")
-                    .requires(source -> config.teleportation != null && config.teleportation.tpa != null)
+                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
                     .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
                     .then(argument("target", EntityArgumentType.player()).suggests(this::getTPASenderSuggestions)
                             .executes(ctx -> tpaCancel(ctx, getPlayer(ctx, "target"))))
@@ -103,50 +104,28 @@ public class TPA {
         final ServerPlayerEntity tFrom = ctx.getSource().getPlayer();
 
         if (tFrom.equals(tTo)) {
-            tFrom.sendMessage(new LiteralText("You cannot request to teleport to yourself!").formatted(Formatting.RED), false);
+            tFrom.sendMessage(L.get("teleportation.tpa.to-self"), false);
             return 1;
         }
 
         if (checkCooldown(tFrom)) return 1;
 
-        TPARequest tr = new TPARequest(tFrom, tTo, false, config.teleportation.tpa.timeout * 1000);
+        TPARequest tr = new TPARequest(tFrom, tTo, false, CONFIG.teleportation.tpa.timeout * 1000);
         if (activeTPA.stream().anyMatch(tpaRequest -> tpaRequest.equals(tr))) {
-            tFrom.sendMessage(new LiteralText("There is already an ongoing request like this!").formatted(Formatting.RED), false);
+            tFrom.sendMessage(L.get("teleportation.tpa.already-exists"), false);
             return 1;
         }
+
+        Map<String, ?> arguments = tr.asArguments();
         tr.setTimeoutCallback(() -> {
             activeTPA.remove(tr);
-            tFrom.sendMessage(new LiteralText("Your teleport request to " + tTo.getName().asString() + " has timed out!").formatted(Formatting.RED), false);
-            tTo.sendMessage(new LiteralText("Teleport request from " + tFrom.getName().asString() + " has timed out!").formatted(Formatting.RED), false);
+            tFrom.sendMessage(L.get("teleportation.tpa.init.timed-out.to", arguments), false);
+            tTo.sendMessage(L.get("teleportation.tpa.init.timed-out.from", arguments), false);
         });
         activeTPA.add(tr);
 
-        tFrom.sendMessage(
-                new LiteralText("You have requested to teleport to ").formatted(Formatting.LIGHT_PURPLE)
-                        .append(new LiteralText(tTo.getName().asString()).formatted(Formatting.AQUA))
-                        .append(new LiteralText("\nTo cancel type ").formatted(Formatting.LIGHT_PURPLE))
-                        .append(new LiteralText("/tpacancel [<player>]").styled(s ->
-                                s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpacancel " + tTo.getName().asString()))
-                                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("/tpacancel " + tTo.getName().asString())))
-                                        .withColor(Formatting.GOLD)))
-                        .append(new LiteralText("\nThis request will timeout in " + config.teleportation.tpa.timeout + " seconds.").formatted(Formatting.LIGHT_PURPLE)),
-                false);
-
-        tTo.sendMessage(
-                new LiteralText(tFrom.getName().asString()).formatted(Formatting.AQUA)
-                        .append(new LiteralText(" has requested to teleport to you!").formatted(Formatting.LIGHT_PURPLE))
-                        .append(new LiteralText("\nTo accept type ").formatted(Formatting.LIGHT_PURPLE))
-                        .append(new LiteralText("/tpaaccept [<player>]").styled(s ->
-                                s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaaccept " + tFrom.getName().asString()))
-                                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("/tpaaccept " + tFrom.getName().asString())))
-                                        .withColor(Formatting.GOLD)))
-                        .append(new LiteralText("\nTo deny type ").formatted(Formatting.LIGHT_PURPLE))
-                        .append(new LiteralText("/tpadeny [<player>]").styled(s ->
-                                s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpadeny " + tFrom.getName().asString()))
-                                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("/tpadeny " + tFrom.getName().asString())))
-                                        .withColor(Formatting.GOLD)))
-                        .append(new LiteralText("\nThis request will timeout in " + config.teleportation.tpa.timeout + " seconds.").formatted(Formatting.LIGHT_PURPLE)),
-                false);
+        tFrom.sendMessage(L.get("teleportation.tpa.init.request.from", arguments), false);
+        tTo.sendMessage(L.get("teleportation.tpa.init.request.to", arguments), false);
         return 1;
     }
 
@@ -154,59 +133,37 @@ public class TPA {
         final ServerPlayerEntity tTo = ctx.getSource().getPlayer();
 
         if (tTo.equals(tFrom)) {
-            tTo.sendMessage(new LiteralText("You cannot request for you to teleport to yourself!").formatted(Formatting.RED), false);
+            tFrom.sendMessage(L.get("teleportation.tpa.to-self"), false);
             return 1;
         }
 
         if (checkCooldown(tFrom)) return 1;
 
-        TPARequest tr = new TPARequest(tFrom, tTo, true, config.teleportation.tpa.timeout * 1000);
+        TPARequest tr = new TPARequest(tFrom, tTo, true, CONFIG.teleportation.tpa.timeout * 1000);
         if (activeTPA.stream().anyMatch(tpaRequest -> tpaRequest.equals(tr))) {
-            tTo.sendMessage(new LiteralText("There is already an ongoing request like this!").formatted(Formatting.RED), false);
+            tFrom.sendMessage(L.get("teleportation.tpa.already-exists"), false);
             return 1;
         }
+
+        Map<String, ?> arguments = tr.asArguments();
         tr.setTimeoutCallback(() -> {
             activeTPA.remove(tr);
-            tTo.sendMessage(new LiteralText("Your teleport request for " + tFrom.getName().asString() + " to you has timed out!").formatted(Formatting.RED), false);
-            tFrom.sendMessage(new LiteralText("Teleport request for you to " + tTo.getName().asString() + " has timed out!").formatted(Formatting.RED), false);
+            tTo.sendMessage(L.get("teleportation.tpa.here.timed-out.to", arguments), false);
+            tFrom.sendMessage(L.get("teleportation.tpa.here.timed-out.from", arguments), false);
         });
         activeTPA.add(tr);
 
-        tTo.sendMessage(
-                new LiteralText("You have requested for ").formatted(Formatting.LIGHT_PURPLE)
-                        .append(new LiteralText(tFrom.getName().asString()).formatted(Formatting.AQUA))
-                        .append(new LiteralText(" to teleport to you!\nTo cancel type ").formatted(Formatting.LIGHT_PURPLE))
-                        .append(new LiteralText("/tpacancel [<player>]").styled(s ->
-                                s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpacancel " + tFrom.getName().asString()))
-                                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("/tpacancel " + tFrom.getName().asString())))
-                                        .withColor(Formatting.GOLD)))
-                        .append(new LiteralText("\nThis request will timeout in " + config.teleportation.tpa.timeout + " seconds.").formatted(Formatting.LIGHT_PURPLE)),
-                false);
-
-        tFrom.sendMessage(
-                new LiteralText(tTo.getName().asString()).formatted(Formatting.AQUA)
-                        .append(new LiteralText(" has requested for you to teleport to them!").formatted(Formatting.LIGHT_PURPLE))
-                        .append(new LiteralText("\nTo accept type ").formatted(Formatting.LIGHT_PURPLE))
-                        .append(new LiteralText("/tpaaccept [<player>]").styled(s ->
-                                s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaaccept " + tTo.getName().asString()))
-                                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("/tpaaccept " + tTo.getName().asString())))
-                                        .withColor(Formatting.GOLD)))
-                        .append(new LiteralText("\nTo deny type ").formatted(Formatting.LIGHT_PURPLE))
-                        .append(new LiteralText("/tpadeny [<player>]").styled(s ->
-                                s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpadeny " + tTo.getName().asString()))
-                                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("/tpadeny " + tTo.getName().asString())))
-                                        .withColor(Formatting.GOLD)))
-                        .append(new LiteralText("\nThis request will timeout in " + config.teleportation.tpa.timeout + " seconds.").formatted(Formatting.LIGHT_PURPLE)),
-                false);
+        tFrom.sendMessage(L.get("teleportation.tpa.here.request.from", arguments), false);
+        tTo.sendMessage(L.get("teleportation.tpa.here.request.to", arguments), false);
         return 1;
     }
 
     private boolean checkCooldown(ServerPlayerEntity tFrom) {
         if (recentRequests.containsKey(tFrom.getUuid())) {
             long diff = Instant.now().getEpochSecond() - recentRequests.get(tFrom.getUuid());
-            if (diff < config.teleportation.tpa.cooldown) {
-                tFrom.sendMessage(new LiteralText("You cannot make a request for ").append(String.valueOf(config.teleportation.tpa.cooldown - diff))
-                        .append(" more seconds!").formatted(Formatting.RED), false);
+            if (diff < CONFIG.teleportation.tpa.cooldown) {
+                tFrom.sendMessage(L.get("teleportation.tpa.cooldown",
+                        new HashMap<String, Long>() {{ put("remaining", CONFIG.teleportation.tpa.cooldown - diff); }}), false);
                 return true;
             }
         }
@@ -223,9 +180,9 @@ public class TPA {
 
         if (!otr.isPresent()) {
             if (action == TPAAction.CANCEL) {
-                rFrom.sendMessage(new LiteralText("No ongoing request!").formatted(Formatting.RED), false);
+                rFrom.sendMessage(L.get("teleportation.tpa.no-ongoing"), false);
             } else {
-                rTo.sendMessage(new LiteralText("No ongoing request!").formatted(Formatting.RED), false);
+                rTo.sendMessage(L.get("teleportation.tpa.no-ongoing"), false);
             }
             return null;
         }
@@ -240,7 +197,7 @@ public class TPA {
             TPARequest[] candidates;
             candidates = activeTPA.stream().filter(tpaRequest -> tpaRequest.rTo.equals(rTo)).toArray(TPARequest[]::new);
             if (candidates.length > 1) {
-                MutableText text = new LiteralText("You currently have multiple active teleport requests! Please specify whose request to accept.\n").formatted(Formatting.LIGHT_PURPLE);
+                MutableText text = L.get("teleportation.tpa.accept.multiple-ongoing").copy();
                 Arrays.stream(candidates).map(tpaRequest -> tpaRequest.rFrom.getName().asString()).forEach(name ->
                         text.append(new LiteralText(name).styled(s ->
                                 s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaaccept " + name))
@@ -250,7 +207,7 @@ public class TPA {
                 return 1;
             }
             if (candidates.length < 1) {
-                rTo.sendMessage(new LiteralText("You currently don't have any teleport requests!").formatted(Formatting.RED), false);
+                rTo.sendMessage(L.get("teleportation.tpa.no-ongoing"), false);
                 return 1;
             }
             rFrom = candidates[0].rFrom;
@@ -259,11 +216,11 @@ public class TPA {
         TPARequest tr = getTPARequest(rFrom, rTo, TPAAction.ACCEPT);
         if (tr == null) return 1;
         TeleportUtils.genericTeleport(
-                config.teleportation.tpa.bossBar, config.teleportation.tpa.actionBar, config.teleportation.tpa.standStill,
+                "teleportation.tpa", CONFIG.teleportation.tpa.bossBar, CONFIG.teleportation.tpa.actionBar, CONFIG.teleportation.tpa.standStill,
                 rFrom, () -> {
                     if (tr.tFrom.removed || tr.tTo.removed) tr.refreshPlayers();
                     tr.tFrom.teleport(tr.tTo.getServerWorld(), tr.tTo.getX(), tr.tTo.getY(), tr.tTo.getZ(), tr.tTo.yaw, tr.tTo.pitch);
-                    switch (config.teleportation.tpa.cooldownMode) {
+                    switch (CONFIG.teleportation.tpa.cooldownMode) {
                         case BothUsers:
                             recentRequests.put(tr.tFrom.getUuid(), Instant.now().getEpochSecond());
                             recentRequests.put(tr.tTo.getUuid(), Instant.now().getEpochSecond());
@@ -279,9 +236,10 @@ public class TPA {
 
         tr.cancelTimeout();
         activeTPA.remove(tr);
-        tr.rTo.sendMessage(new LiteralText("You have accepted the teleport request!"), false);
-        tr.rFrom.sendMessage(new LiteralText(tr.rTo.getName().asString()).formatted(Formatting.AQUA)
-                .append(new LiteralText(" has accepted the teleportation request!").formatted(Formatting.LIGHT_PURPLE)), false);
+
+        Map<String, ?> arguments = tr.asArguments();
+        tr.rTo.sendMessage(L.get("teleportation.tpa.accept.to", arguments), false);
+        tr.rFrom.sendMessage(L.get("teleportation.tpa.accept.from", arguments), false);
         return 1;
     }
 
@@ -293,7 +251,7 @@ public class TPA {
             TPARequest[] candidates;
             candidates = activeTPA.stream().filter(tpaRequest -> tpaRequest.rTo.equals(rTo)).toArray(TPARequest[]::new);
             if (candidates.length > 1) {
-                MutableText text = new LiteralText("You currently have multiple active teleport requests! Please specify whose request to deny.\n").formatted(Formatting.LIGHT_PURPLE);
+                MutableText text = L.get("teleportation.tpa.deny.multiple-ongoing").copy();
                 Arrays.stream(candidates).map(tpaRequest -> tpaRequest.rFrom.getName().asString()).forEach(name ->
                         text.append(new LiteralText(name).styled(s ->
                                 s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpadeny " + name))
@@ -303,7 +261,7 @@ public class TPA {
                 return 1;
             }
             if (candidates.length < 1) {
-                rTo.sendMessage(new LiteralText("You currently don't have any teleport requests!").formatted(Formatting.RED), false);
+                rTo.sendMessage(L.get("teleportation.tpa.no-ongoing"), false);
                 return 1;
             }
             rFrom = candidates[0].rFrom;
@@ -313,9 +271,10 @@ public class TPA {
         if (tr == null) return 1;
         tr.cancelTimeout();
         activeTPA.remove(tr);
-        tr.rTo.sendMessage(new LiteralText("You have cancelled the teleport request!"), false);
-        tr.rFrom.sendMessage(new LiteralText(tr.rTo.getName().asString()).formatted(Formatting.AQUA)
-                .append(new LiteralText(" has cancelled the teleportation request!").formatted(Formatting.RED)), false);
+
+        Map<String, ?> arguments = tr.asArguments();
+        tr.rTo.sendMessage(L.get("teleportation.tpa.deny.to", arguments), false);
+        tr.rFrom.sendMessage(L.get("teleportation.tpa.deny.from", arguments), false);
         return 1;
     }
 
@@ -326,7 +285,7 @@ public class TPA {
             TPARequest[] candidates;
             candidates = activeTPA.stream().filter(tpaRequest -> tpaRequest.rFrom.equals(rFrom)).toArray(TPARequest[]::new);
             if (candidates.length > 1) {
-                MutableText text = new LiteralText("You currently have multiple active teleport requests! Please specify which request to cancel.\n").formatted(Formatting.LIGHT_PURPLE);
+                MutableText text = L.get("teleportation.tpa.cancel.multiple-ongoing").copy();
                 Arrays.stream(candidates).map(tpaRequest -> tpaRequest.rFrom.getName().asString()).forEach(name ->
                         text.append(new LiteralText(name).styled(s ->
                                 s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpacancel " + name))
@@ -336,7 +295,7 @@ public class TPA {
                 return 1;
             }
             if (candidates.length < 1) {
-                rFrom.sendMessage(new LiteralText("You currently don't have any teleport requests!").formatted(Formatting.RED), false);
+                rFrom.sendMessage(L.get("teleportation.tpa.no-ongoing"), false);
                 return 1;
             }
             rTo = candidates[0].rFrom;
@@ -346,9 +305,10 @@ public class TPA {
         if (tr == null) return 1;
         tr.cancelTimeout();
         activeTPA.remove(tr);
-        tr.rFrom.sendMessage(new LiteralText("You have cancelled the teleport request!"), false);
-        tr.rTo.sendMessage(new LiteralText(tr.rFrom.getName().asString()).formatted(Formatting.AQUA)
-                .append(new LiteralText(" has cancelled the teleportation request!").formatted(Formatting.RED)), false);
+
+        Map<String, ?> arguments = tr.asArguments();
+        tr.rTo.sendMessage(L.get("teleportation.tpa.cancel.to", arguments), false);
+        tr.rFrom.sendMessage(L.get("teleportation.tpa.cancel.from", arguments), false);
         return 1;
     }
 }

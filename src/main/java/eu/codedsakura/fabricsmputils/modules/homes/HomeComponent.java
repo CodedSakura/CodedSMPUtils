@@ -7,13 +7,16 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static eu.codedsakura.common.TextUtils.valueRepr;
 
 public class HomeComponent implements INamedDirectionalPointComponent {
-    private double x, y, z;
-    private float pitch, yaw;
-    private String name;
-    private Identifier dim;
+    private final double x, y, z;
+    private final float pitch, yaw;
+    private final String name;
+    private final Identifier dim;
 
     public HomeComponent(double x, double y, double z, float pitch, float yaw, Identifier dim, String name) {
         this.x = x;
@@ -66,12 +69,15 @@ public class HomeComponent implements INamedDirectionalPointComponent {
     @Override public Vec3d getCoords()  { return new Vec3d(x, y, z); }
     @Override public Identifier getDimID() { return dim; }
 
-    @Override
-    public MutableText toText(MinecraftServer server) {
-        return new TranslatableText("%s\n%s; %s; %s\n%s; %s\n%s",
-                valueRepr("Name", name),
-                valueRepr("X", x), valueRepr("Y", y), valueRepr("Z", z),
-                valueRepr("Yaw", yaw), valueRepr("Pitch", pitch),
-                valueRepr("In", dim.toString()));
+    public Map<String, ?> asArguments() {
+        return new HashMap<String, Object>() {{
+            put("name", name);
+            put("x", x);
+            put("y", y);
+            put("z", z);
+            put("yaw", yaw);
+            put("pitch", pitch);
+            put("dimension", dim.toString());
+        }};
     }
 }

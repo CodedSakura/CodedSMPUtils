@@ -6,17 +6,17 @@ import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+
+import static eu.codedsakura.fabricsmputils.FabricSMPUtils.L;
 
 public class TeleportUtils {
     private static final ArrayList<CounterRunnable> tasks = new ArrayList<>();
+    private static final String baseModule = "teleportation.";
 
     public static void initialize() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -25,7 +25,15 @@ public class TeleportUtils {
         });
     }
 
-    public static void genericTeleport(String bossBar, Boolean actionBar, double standStillTime, ServerPlayerEntity who, Runnable onCounterDone) {
+    private static Text lFallback(String module, String entry) {
+        return L.get(baseModule + entry, module + '.' + entry);
+    }
+    private static Text lFallback(String module, String entry, Map<String, ?> args) {
+        return L.get(baseModule + entry, module + '.' + entry, args);
+    }
+
+    public static void genericTeleport(String localeModule, String bossBar, Boolean actionBar, double standStillTime, ServerPlayerEntity who, Runnable onCounterDone) {
+        final String module = localeModule.replaceAll("\\.+$", "") + '.';
         MinecraftServer server = who.server;
         final Vec3d[] lastPos = {who.getPos()};
 
@@ -34,7 +42,7 @@ public class TeleportUtils {
 
         CommandBossBar standStillBar = null;
         if (useBossBar) {
-            standStillBar = server.getBossBarManager().add(new Identifier("standstill"), LiteralText.EMPTY);
+            standStillBar = server.getBossBarManager().add(new Identifier("standstill"), lFallback(module, "boss-bar"));
             standStillBar.addPlayer(who);
             standStillBar.setColor(BossBar.Color.byName(bossBar));
         }
@@ -51,7 +59,7 @@ public class TeleportUtils {
                         server.getBossBarManager().remove(finalStandStillBar);
                     }
                     if (actionBar) {
-                        who.sendMessage(new LiteralText("Teleporting!").formatted(Formatting.LIGHT_PURPLE), true);
+                        who.sendMessage(lFallback(module, "action-bar.teleporting"), true);
                     }
                     new Timer().schedule(new TimerTask() {
                         @Override
@@ -74,19 +82,19 @@ public class TeleportUtils {
                     counter = standStillInTicks;
                 }
 
+                HashMap<String, ?> arguments = new HashMap<String, Object>() {{
+                    put("remaining", (int) Math.floor((counter / 20f) + 1));
+                }};
+
                 if (useBossBar) {
                     finalStandStillBar.setPercent((float) counter / standStillInTicks);
                 }
                 if (actionBar) {
-                    who.sendMessage(new LiteralText("Stand still for ").formatted(Formatting.LIGHT_PURPLE)
-                            .append(new LiteralText(Integer.toString((int) Math.floor((counter / 20f) + 1))).formatted(Formatting.GOLD))
-                            .append(new LiteralText(" more seconds!").formatted(Formatting.LIGHT_PURPLE)), true);
+                    who.sendMessage(lFallback(module, "action-bar.text", arguments), true);
                 }
 
-                who.networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.SUBTITLE,
-                        new LiteralText("Please stand still...").formatted(Formatting.RED, Formatting.ITALIC)));
-                who.networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE,
-                        new LiteralText("Teleporting!").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD)));
+                who.networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.SUBTITLE, lFallback(module, "title.subtitle", arguments)));
+                who.networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, lFallback(module, "title.title", arguments)));
             }
         });
     }

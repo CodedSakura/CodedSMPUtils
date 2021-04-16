@@ -1,11 +1,14 @@
-# language=properties# suppress inspection "UnusedProperty" for whole file
+# suppress inspection "UnusedProperty" for whole file
 teleportation.boss-bar=
-teleportation.action-bar-text=[light_purple]Stand still for {$remaining} more seconds
+teleportation.action-bar.text=[light_purple]Stand still for [gold]{$remaining}[/gold] more seconds
+teleportation.action-bar.teleporting=[light_purple]Teleporting!
+teleportation.title.subtitle=[red][italic]Please stand still...
+teleportation.title.title=[light_purple][bold]Teleporting!
 
 teleportation.tpa.to-self=[red]You cannot request to teleport to yourself!
 teleportation.tpa.already-exists=[red]There is already an ongoing request like this!
-teleportation.tpa.init.timed-out.from-you=[red]Your teleport request to [aqua]{$to-name}[/aqua] has timed out!
-teleportation.tpa.init.timed-out.to-you=[red]Teleport request from [aqua]{$from-name}[/aqua] has timed out!
+teleportation.tpa.init.timed-out.from=[red]Your teleport request to [aqua]{$to-name}[/aqua] has timed out!
+teleportation.tpa.init.timed-out.to=[red]Teleport request from [aqua]{$from-name}[/aqua] has timed out!
 teleportation.tpa.init.request.from=[light_purple]You have requested to teleport to [aqua]{$to-name}[/aqua]\n\
   To cancel type [gold][hover:show_text:'/tpacancel {$to-name}'][click:run_command:/tpacancel {$to-name}]/tpacancel \[<player>\][/click][/hover][/gold]\n\
   This request will timeout in {$timout-length} seconds.
@@ -13,8 +16,8 @@ teleportation.tpa.init.request.to=[light_purple][aqua]{$from-name}[/aqua] has re
   To accept type [gold][hover:show_text:'/tpaaccept {$to-name}'][click:run_command:/tpaaccept {$to-name}]/tpaaccept \[<player>\][/click][/hover][/gold]\n\
   To deny type [gold][hover:show_text:'/tpadeny {$to-name}'][click:run_command:/tpadeny {$to-name}]/tpadeny \[<player>\][/click][/hover][/gold]\n\
   This request will timeout in {$timout-length} seconds.
-teleportation.tpa.here.timed-out.to-you=[red]Your teleport request for {$from-name} to teleport to you has timed out!
-teleportation.tpa.here.timed-out.from-you=[red]Teleport request for you to teleport to {$to-name} has timed out!
+teleportation.tpa.here.timed-out.to=[red]Your teleport request for {$from-name} to teleport to you has timed out!
+teleportation.tpa.here.timed-out.from=[red]Teleport request for you to teleport to {$to-name} has timed out!
 teleportation.tpa.here.request.to=[light_purple]You have requested for [aqua]{$from-name}[/aqua] to teleport to you!\n\
   To cancel type [gold][hover:show_text:'/tpacancel {$to-name}'][click:run_command:/tpacancel {$to-name}]/tpacancel \[<player>\][/click][/hover][/gold]\n\
   This request will timeout in {$timout-length} seconds.
@@ -44,15 +47,17 @@ teleportation.warps.add.failed=[red]Failed to add warp!
 teleportation.warps.add.success=[green]Warp [gold]{$name}[/gold] successfully added!
 teleportation.warps.remove.failed=[red]Failed to remove warp!
 teleportation.warps.remove.success=[yellow]Warp [gold]{$name}[gold] successfully removed!
-teleportation.warps.list.in-dimension.header=[light_purple]In [aqua]{$dimension}[/aqua]:
-teleportation.warps.list.in-dimension.entry=  [gold][hover:show_text:'[italic]Click to teleport!\n{$details}'][click:run_command:/warp "{$name}"]{$name}
-teleportation.warps.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
-teleportation.warps.as-text=Name: [gold]{$name}[/gold]\n\
-  Author:[gold]{$author}[/gold]\n\
+teleportation.warps.list.header=[light_purple]In [aqua]{$dimension}[/aqua]:
+teleportation.warps.list.entry=\n  [hover:show_text:'\
+  [italic]Click to teleport![/italic]\n\
+  Name: [gold]{$name}[/gold]\n\
+  Author: [gold]{$author}[/gold]\n\
   X: [gold]{$x}[/gold]; Y: [gold]{$y}[/gold]; Z: [gold]{$z}[/gold]\n\
   Yaw: [gold]{$yaw}[/gold]; Pitch: [gold]{$pitch}[/gold]\n\
   In: [gold]{$dimension}[/gold]\n\
-  ID: [gold]{$id-trunc}[/gold]
+  ID: [gold]{$id-trunc}[/gold]\
+  '][click:run_command:/warp "{$name}"][gold]{$name}
+teleportation.warps.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
 
 teleportation.back=
 
@@ -60,21 +65,24 @@ teleportation.homes.cooldown=[red]You cannot make a request for [gold]{$remainin
 teleportation.homes.not-exists=[red]This home does not exist!
 teleportation.homes.limit=[red]Home limit reached!
 teleportation.homes.add.error=[red]Something went wrong adding the home!
-teleportation.homes.add.success=[light_purple]Home [gold][hover:show_text:{$details}]{$name}[/hover][/gold] added successfully!
+teleportation.homes.add.success=[light_purple]Home [gold]{$name}[/gold] added successfully!
 teleportation.homes.add.could-not=[red]Could not add home (probably already exists)!
 teleportation.homes.remove.error=[red]Something went wrong removing the home!
-teleportation.homes.remove.success=[light_purple]Home [gold]{$name}[/gold] added successfully!
+teleportation.homes.remove.success=[light_purple]Home [gold]{$name}[/gold] removed successfully!
 teleportation.homes.remove.could-not=[red]Could not remove home!
-teleportation.homes.list.click=Click to teleport.
-teleportation.homes.as-text=Name: [gold]{$name}[/gold]\n\
+teleportation.homes.list.header={$count}/{$max} homes:
+teleportation.homes.list.entry=\n  [hover:show_text:'\
+  [italic]Click to teleport![/italic]\n\
+  Name: [gold]{$name}[/gold]\n\
   X: [gold]{$x}[/gold]; Y: [gold]{$y}[/gold]; Z: [gold]{$z}[/gold]\n\
   Yaw: [gold]{$yaw}[/gold]; Pitch: [gold]{$pitch}[/gold]\n\
-  In: [gold]{$dimension}[/gold]
+  In: [gold]{$dimension}[/gold]\
+  '][click:run_command:/home "{$name}"][gold]{$name}
 
-pvp.state.on=enabled
-pvp.state.off=disabled
-pvp.change.one=[light_purple]You have [gold]{$state}[/gold] PvP!
-pvp.change.all=[light_purple]You have [gold]{$state}[/gold] PvP for all selected players!
+pvp.change.one.on=[light_purple]You have [gold]enabled[/gold] PvP!
+pvp.change.one.off=[light_purple]You have [gold]disabled[/gold] PvP!
+pvp.change.all.on=[light_purple]You have [gold]enabled[/gold] PvP for all selected players!
+pvp.change.all.off=[light_purple]You have [gold]disabled[/gold] PvP for all selected players!
 
 bottle=
 
