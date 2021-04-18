@@ -1,4 +1,4 @@
-package eu.codedsakura.fabricsmputils.modules.homes;
+package eu.codedsakura.fabricsmputils.modules.teleportation.homes;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 

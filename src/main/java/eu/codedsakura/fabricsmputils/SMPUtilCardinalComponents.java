@@ -6,12 +6,12 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
-import eu.codedsakura.fabricsmputils.modules.homes.HomeDataComponent;
-import eu.codedsakura.fabricsmputils.modules.homes.IHomeDataComponent;
-import eu.codedsakura.fabricsmputils.modules.pvp.IPvPComponent;
-import eu.codedsakura.fabricsmputils.modules.pvp.PvPComponent;
-import eu.codedsakura.fabricsmputils.modules.warps.IWarpListComponent;
-import eu.codedsakura.fabricsmputils.modules.warps.WarpListComponent;
+import eu.codedsakura.fabricsmputils.modules.teleportation.homes.HomeDataComponent;
+import eu.codedsakura.fabricsmputils.modules.teleportation.homes.IHomeDataComponent;
+import eu.codedsakura.fabricsmputils.modules.teleportation.pvp.IPvPComponent;
+import eu.codedsakura.fabricsmputils.modules.teleportation.pvp.PvPComponent;
+import eu.codedsakura.fabricsmputils.modules.teleportation.warps.IWarpListComponent;
+import eu.codedsakura.fabricsmputils.modules.teleportation.warps.WarpListComponent;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.minecraft.util.Identifier;
 

@@ -1,4 +1,4 @@
-package eu.codedsakura.fabricsmputils.modules.pvp;
+package eu.codedsakura.fabricsmputils.modules.teleportation.pvp;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 

@@ -1,4 +1,4 @@
-package eu.codedsakura.fabricsmputils.modules.tpa;
+package eu.codedsakura.fabricsmputils.modules.teleportation.tpa;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 

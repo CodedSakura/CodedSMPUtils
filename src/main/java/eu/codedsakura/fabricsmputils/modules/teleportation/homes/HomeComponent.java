@@ -1,16 +1,11 @@
-package eu.codedsakura.fabricsmputils.modules.homes;
+package eu.codedsakura.fabricsmputils.modules.teleportation.homes;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static eu.codedsakura.common.TextUtils.valueRepr;
 
 public class HomeComponent implements INamedDirectionalPointComponent {
     private final double x, y, z;

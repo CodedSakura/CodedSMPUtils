@@ -1,12 +1,12 @@
-package eu.codedsakura.fabricsmputils.modules.tpa;
+package eu.codedsakura.fabricsmputils.modules.teleportation.tpa;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.codedsakura.common.TeleportUtils;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -33,41 +33,39 @@ public class TPA {
     private final ArrayList<TPARequest> activeTPA = new ArrayList<>();
     private final HashMap<UUID, Long> recentRequests = new HashMap<>();
 
-    public void initialize() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-            dispatcher.register(literal("tpa")
-                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                    .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
-                    .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
-                            .executes(ctx -> tpaInit(ctx, getPlayer(ctx, "target")))));
+    public TPA(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(literal("tpa")
+                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
+                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
+                        .executes(ctx -> tpaInit(ctx, getPlayer(ctx, "target")))));
 
-            dispatcher.register(literal("tpahere")
-                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                    .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
-                    .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
-                            .executes(ctx -> tpaHere(ctx, getPlayer(ctx, "target")))));
+        dispatcher.register(literal("tpahere")
+                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
+                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
+                        .executes(ctx -> tpaHere(ctx, getPlayer(ctx, "target")))));
 
-            dispatcher.register(literal("tpaaccept")
-                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                    .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
-                    .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
-                            .executes(ctx -> tpaAccept(ctx, getPlayer(ctx, "target"))))
-                    .executes(ctx -> tpaAccept(ctx, null)));
+        dispatcher.register(literal("tpaaccept")
+                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
+                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
+                        .executes(ctx -> tpaAccept(ctx, getPlayer(ctx, "target"))))
+                .executes(ctx -> tpaAccept(ctx, null)));
 
-            dispatcher.register(literal("tpadeny")
-                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                    .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
-                    .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
-                            .executes(ctx -> tpaDeny(ctx, getPlayer(ctx, "target"))))
-                    .executes(ctx -> tpaDeny(ctx, null)));
+        dispatcher.register(literal("tpadeny")
+                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
+                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
+                        .executes(ctx -> tpaDeny(ctx, getPlayer(ctx, "target"))))
+                .executes(ctx -> tpaDeny(ctx, null)));
 
-            dispatcher.register(literal("tpacancel")
-                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                    .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
-                    .then(argument("target", EntityArgumentType.player()).suggests(this::getTPASenderSuggestions)
-                            .executes(ctx -> tpaCancel(ctx, getPlayer(ctx, "target"))))
-                    .executes(ctx -> tpaCancel(ctx, null)));
-        });
+        dispatcher.register(literal("tpacancel")
+                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
+                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .then(argument("target", EntityArgumentType.player()).suggests(this::getTPASenderSuggestions)
+                        .executes(ctx -> tpaCancel(ctx, getPlayer(ctx, "target"))))
+                .executes(ctx -> tpaCancel(ctx, null)));
     }
 
     @Nullable

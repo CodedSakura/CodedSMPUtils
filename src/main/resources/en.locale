@@ -1,4 +1,8 @@
 # suppress inspection "UnusedProperty" for whole file
+base.config.failed=[red]Failed to reload the config! Please contact the server owner about this!
+base.config.partial=[yellow]Successfully reloaded the config, but some changes will be applied only after a restart!
+base.config.success=[green]Successfully reloaded the config!
+
 teleportation.boss-bar=
 teleportation.action-bar.text=[light_purple]Stand still for [gold]{$remaining}[/gold] more seconds
 teleportation.action-bar.teleporting=[light_purple]Teleporting!

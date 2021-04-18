@@ -1,9 +1,9 @@
-package eu.codedsakura.fabricsmputils.modules.pvp;
+package eu.codedsakura.fabricsmputils.modules.teleportation.pvp;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,22 +18,21 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class PVP {
-    public void initialize() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, listener) ->
-                dispatcher.register(literal("pvp")
-                    .requires(source -> CONFIG.pvp != null)
-                    .requires(Permissions.require("fabricspmutils.pvp", true))
-                    .executes(this::togglePvP)
-                    .then(literal("on")
-                            .executes(ctx -> this.setPvP(ctx, true))
-                            .then(argument("players", EntityArgumentType.players())
-                                    .requires(Permissions.require("fabricspmutils.pvp.others", 2))
-                                    .executes(ctx -> this.setPvP(ctx, true, EntityArgumentType.getPlayers(ctx, "players")))))
-                    .then(literal("off")
-                            .executes(ctx -> this.setPvP(ctx, false))
-                            .then(argument("players", EntityArgumentType.players())
-                                    .requires(Permissions.require("fabricspmutils.pvp.others", 2))
-                                    .executes(ctx -> this.setPvP(ctx, false, EntityArgumentType.getPlayers(ctx, "players")))))));
+    public PVP(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(literal("pvp")
+            .requires(source -> CONFIG.pvp != null)
+            .requires(Permissions.require("fabricspmutils.pvp", true))
+            .executes(this::togglePvP)
+            .then(literal("on")
+                    .executes(ctx -> this.setPvP(ctx, true))
+                    .then(argument("players", EntityArgumentType.players())
+                            .requires(Permissions.require("fabricspmutils.pvp.others", 2))
+                            .executes(ctx -> this.setPvP(ctx, true, EntityArgumentType.getPlayers(ctx, "players")))))
+            .then(literal("off")
+                    .executes(ctx -> this.setPvP(ctx, false))
+                    .then(argument("players", EntityArgumentType.players())
+                            .requires(Permissions.require("fabricspmutils.pvp.others", 2))
+                            .executes(ctx -> this.setPvP(ctx, false, EntityArgumentType.getPlayers(ctx, "players"))))));
     }
 
     private int setPvP(CommandContext<ServerCommandSource> ctx, boolean b) throws CommandSyntaxException {

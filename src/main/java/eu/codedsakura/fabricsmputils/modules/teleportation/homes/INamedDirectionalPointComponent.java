@@ -1,7 +1,5 @@
-package eu.codedsakura.fabricsmputils.modules.homes;
+package eu.codedsakura.fabricsmputils.modules.teleportation.homes;
 
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.MutableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 

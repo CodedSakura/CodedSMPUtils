@@ -1,4 +1,4 @@
-package eu.codedsakura.fabricsmputils.modules.homes;
+package eu.codedsakura.fabricsmputils.modules.teleportation.homes;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;

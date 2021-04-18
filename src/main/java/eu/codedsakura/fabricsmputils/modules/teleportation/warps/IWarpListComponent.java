@@ -1,4 +1,4 @@
-package eu.codedsakura.fabricsmputils.modules.warps;
+package eu.codedsakura.fabricsmputils.modules.teleportation.warps;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 

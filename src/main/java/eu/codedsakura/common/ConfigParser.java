@@ -4,7 +4,6 @@ import eu.codedsakura.common.annotations.*;
 import eu.codedsakura.common.exceptions.ConfigParserException;
 import eu.codedsakura.common.expression.BoolExpression;
 import eu.codedsakura.common.expression.IntExpression;
-import eu.codedsakura.fabricsmputils.config.FabricSMPUtilsConfig;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -16,7 +15,6 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**

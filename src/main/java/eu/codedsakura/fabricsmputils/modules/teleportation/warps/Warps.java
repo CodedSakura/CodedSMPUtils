@@ -1,5 +1,6 @@
-package eu.codedsakura.fabricsmputils.modules.warps;
+package eu.codedsakura.fabricsmputils.modules.teleportation.warps;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -9,7 +10,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.codedsakura.common.TeleportUtils;
 import eu.codedsakura.common.TextUtils;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.RotationArgumentType;
@@ -52,44 +52,42 @@ public class Warps {
         return out;
     }
 
-    public void initialize() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-            dispatcher.register(literal("warp")
-                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                    .requires(Permissions.require("fabricspmutils.teleportation.warp", true))
-                    .then(argument("name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
-                            .executes(ctx -> warpTo(ctx, getString(ctx, "name")))));
+    public Warps(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(literal("warp")
+                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
+                .requires(Permissions.require("fabricspmutils.teleportation.warp", true))
+                .then(argument("name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
+                        .executes(ctx -> warpTo(ctx, getString(ctx, "name")))));
 
-            dispatcher.register(literal("warps")
-                    .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                    .requires(Permissions.require("fabricspmutils.teleportation.warp", true))
-                    .executes(this::warpList)
-                    .then(literal("list")
-                            .executes(this::warpList)
-                            .then(argument("dimension", DimensionArgumentType.dimension())
-                                    .executes(ctx -> warpList(ctx, DimensionArgumentType.getDimensionArgument(ctx, "dimension")))))
-                    .then(literal("add")
-                            .requires(Permissions.require("fabricspmutils.teleportation.warp.modify", 2))
-                            .executes(ctx -> {throw new SimpleCommandExceptionType(new LiteralText("Provide a warp name!")).create();})
-                            .then(argument("name", StringArgumentType.string())
-                                    .executes(ctx -> warpAdd(ctx, getString(ctx, "name")))
-                                    .then(argument("position", Vec3ArgumentType.vec3(true))
-                                            .executes(ctx -> warpAdd(ctx, getString(ctx, "name"), getPosArgument(ctx, "position").toAbsolutePos(ctx.getSource())))
-                                            .then(argument("rotation", RotationArgumentType.rotation())
-                                                    .executes(ctx -> warpAdd(ctx, getString(ctx, "name"), getPosArgument(ctx, "position").toAbsolutePos(ctx.getSource()), getRotation(ctx, "rotation").toAbsoluteRotation(ctx.getSource())))
-                                                    .then(argument("dimension", DimensionArgumentType.dimension())
-                                                            .executes(ctx -> warpAdd(ctx, getString(ctx, "name"), getPosArgument(ctx, "position").toAbsolutePos(ctx.getSource()), getRotation(ctx, "rotation").toAbsoluteRotation(ctx.getSource()), DimensionArgumentType.getDimensionArgument(ctx, "dimension"))))))))
-                    .then(literal("remove")
-                            .requires(Permissions.require("fabricspmutils.teleportation.warp.modify", 2))
-                            .executes(ctx -> {throw new SimpleCommandExceptionType(new LiteralText("Provide a warp name!")).create();})
-                            .then(argument("name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
-                                    .executes(ctx -> warpRemove(ctx, getString(ctx, "name")))))
-                    .then(literal("warp_player")
-                            .requires(Permissions.require("fabricspmutils.teleportation.warp.warp_player", 2))
-                            .then(argument("player", EntityArgumentType.player())
-                                    .then(argument("warp_name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
-                                            .executes(ctx -> warpTo(ctx, EntityArgumentType.getPlayer(ctx, "player"), getString(ctx, "warp_name")))))));
-        });
+        dispatcher.register(literal("warps")
+                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
+                .requires(Permissions.require("fabricspmutils.teleportation.warp", true))
+                .executes(this::warpList)
+                .then(literal("list")
+                        .executes(this::warpList)
+                        .then(argument("dimension", DimensionArgumentType.dimension())
+                                .executes(ctx -> warpList(ctx, DimensionArgumentType.getDimensionArgument(ctx, "dimension")))))
+                .then(literal("add")
+                        .requires(Permissions.require("fabricspmutils.teleportation.warp.modify", 2))
+                        .executes(ctx -> {throw new SimpleCommandExceptionType(new LiteralText("Provide a warp name!")).create();})
+                        .then(argument("name", StringArgumentType.string())
+                                .executes(ctx -> warpAdd(ctx, getString(ctx, "name")))
+                                .then(argument("position", Vec3ArgumentType.vec3(true))
+                                        .executes(ctx -> warpAdd(ctx, getString(ctx, "name"), getPosArgument(ctx, "position").toAbsolutePos(ctx.getSource())))
+                                        .then(argument("rotation", RotationArgumentType.rotation())
+                                                .executes(ctx -> warpAdd(ctx, getString(ctx, "name"), getPosArgument(ctx, "position").toAbsolutePos(ctx.getSource()), getRotation(ctx, "rotation").toAbsoluteRotation(ctx.getSource())))
+                                                .then(argument("dimension", DimensionArgumentType.dimension())
+                                                        .executes(ctx -> warpAdd(ctx, getString(ctx, "name"), getPosArgument(ctx, "position").toAbsolutePos(ctx.getSource()), getRotation(ctx, "rotation").toAbsoluteRotation(ctx.getSource()), DimensionArgumentType.getDimensionArgument(ctx, "dimension"))))))))
+                .then(literal("remove")
+                        .requires(Permissions.require("fabricspmutils.teleportation.warp.modify", 2))
+                        .executes(ctx -> {throw new SimpleCommandExceptionType(new LiteralText("Provide a warp name!")).create();})
+                        .then(argument("name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
+                                .executes(ctx -> warpRemove(ctx, getString(ctx, "name")))))
+                .then(literal("warp_player")
+                        .requires(Permissions.require("fabricspmutils.teleportation.warp.warp_player", 2))
+                        .then(argument("player", EntityArgumentType.player())
+                                .then(argument("warp_name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
+                                        .executes(ctx -> warpTo(ctx, EntityArgumentType.getPlayer(ctx, "player"), getString(ctx, "warp_name")))))));
     }
 
     private int warpRemove(CommandContext<ServerCommandSource> ctx, String name) throws CommandSyntaxException {

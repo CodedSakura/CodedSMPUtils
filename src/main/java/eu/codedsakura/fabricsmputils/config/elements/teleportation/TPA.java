@@ -1,7 +1,7 @@
 package eu.codedsakura.fabricsmputils.config.elements.teleportation;
 
 import eu.codedsakura.common.annotations.Property;
-import eu.codedsakura.fabricsmputils.modules.tpa.TPACooldownMode;
+import eu.codedsakura.fabricsmputils.modules.teleportation.tpa.TPACooldownMode;
 
 public class TPA extends Teleportable {
     @Property public int timeout = 60;

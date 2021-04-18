@@ -1,19 +1,12 @@
-package eu.codedsakura.fabricsmputils.modules.warps;
+package eu.codedsakura.fabricsmputils.modules.teleportation.warps;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.HashMap;
 import java.util.UUID;
-
-import static eu.codedsakura.common.TextUtils.valueRepr;
 
 public class Warp {
     public double x, y, z;

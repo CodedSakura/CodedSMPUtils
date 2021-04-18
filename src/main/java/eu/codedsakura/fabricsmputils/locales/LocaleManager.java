@@ -9,7 +9,6 @@ import net.minecraft.text.Text;
 
 import javax.script.ScriptException;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -37,6 +36,9 @@ public class LocaleManager {
             inputStream = new FileInputStream(file);
         }
         props.load(inputStream);
+
+        for (Locale locale : config.locales)
+            overrides.put("base." + locale.entry, locale.text);
 
         if (config.teleportation != null) {
             for (Locale locale : config.teleportation.locales)
