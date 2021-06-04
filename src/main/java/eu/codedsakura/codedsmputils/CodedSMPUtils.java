@@ -15,6 +15,7 @@ import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
 import eu.codedsakura.codedsmputils.modules.teleportation.homes.Homes;
 import eu.codedsakura.codedsmputils.modules.teleportation.tpa.TPA;
 import eu.codedsakura.codedsmputils.modules.teleportation.warps.Warps;
+import eu.pb4.placeholders.TextParser;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
@@ -95,6 +96,12 @@ public class CodedSMPUtils implements ModInitializer {
                                         .executes(ctx -> {
                                             ctx.getSource().sendFeedback(new LiteralText(
                                                     L.getEntry(StringArgumentType.getString(ctx, "name"), null)), false);
+                                            return 1;
+                                        })))
+                        .then(literal("text-parser")
+                                .then(argument("data", StringArgumentType.greedyString())
+                                        .executes(ctx -> {
+                                            ctx.getSource().sendFeedback(TextParser.parse(StringArgumentType.getString(ctx, "data")), false);
                                             return 1;
                                         })))));
 

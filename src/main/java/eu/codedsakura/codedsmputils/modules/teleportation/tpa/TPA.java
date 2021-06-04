@@ -129,8 +129,8 @@ public class TPA {
         Map<String, ?> arguments = tr.asArguments();
         tr.setTimeoutCallback(() -> {
             activeTPA.remove(tr);
-            tFrom.sendMessage(L.get("teleportation.tpa.init.timed-out.to", arguments), false);
-            tTo.sendMessage(L.get("teleportation.tpa.init.timed-out.from", arguments), false);
+            tTo.sendMessage(L.get("teleportation.tpa.init.timed-out.to", arguments), false);
+            tFrom.sendMessage(L.get("teleportation.tpa.init.timed-out.from", arguments), false);
         });
         activeTPA.add(tr);
 

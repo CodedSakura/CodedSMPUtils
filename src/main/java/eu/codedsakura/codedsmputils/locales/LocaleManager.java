@@ -136,7 +136,6 @@ public class LocaleManager {
         text = text.replaceAll("(?<!\\\\)\\[", "<").replaceAll("(?<!\\\\)]", ">");
         text = text.replaceAll("\\\\\\[", "[").replaceAll("\\\\]", "]");
 
-//        return CodedSMPUtils.fsa.toNative(CodedSMPUtils.miniMessage.parse(text));
         return TextParser.parse(text);
     }
 
