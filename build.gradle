@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.6-SNAPSHOT'
+    id 'fabric-loom' version '0.8-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -11,17 +11,9 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-    maven {
-        name = 'Ladysnake Mods'
-        url = 'https://ladysnake.jfrog.io/artifactory/mods'
-    }
-    maven {
-        name = "sonatype-oss-snapshots"
-        url = "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-    maven {
-        url = "https://oss.sonatype.org/content/repositories/snapshots"
-    }
+    maven { url 'https://ladysnake.jfrog.io/artifactory/mods' }
+	maven { url 'https://maven.nucleoid.xyz' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     mavenCentral()
 }
 
@@ -40,22 +32,19 @@ dependencies {
     modApi(include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cca_version}"))
     modImplementation(include("io.github.onyxstudios:Cardinal-Components-API:${project.cca_version}"))
 
-    modImplementation include("net.kyori:adventure-platform-fabric:${project.adventure_platform_version}")
-    modImplementation(include("net.kyori:adventure-text-minimessage:${project.mini_message_version}"))
+    modImplementation(include("eu.pb4:placeholder-api:${project.placeholder_api_version}"))
 
     modImplementation(include("me.lucko:fabric-permissions-api:${project.fpa_version}"))
+
+
+    implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version: '15.2'
 }
 
 processResources {
     inputs.property "version", project.version
 
-    from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
+    filesMatching("fabric.mod.json") {
         expand "version": project.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
     }
 }
 

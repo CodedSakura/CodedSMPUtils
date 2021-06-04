@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+    <xs:simpleType name="experience">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d+L?"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="stringBoolean">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[eE][nN][aA][bB][lL][eE][dD]|[dD][iI][sS][aA][bB][lL][eE][dD]"/>
+            <xs:pattern value="[tT][rR][uU][eE]|[fF][aA][lL][sS][eE]"/>
+            <xs:pattern value="[yY][eE][sS]|[nN][oO]"/>
+            <xs:pattern value="[oO][nN]|[oO][fF]{2}"/>
+            <xs:pattern value="[ynYN]"/>
+            <xs:pattern value="[10]"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="identifier">
+        <xs:restriction base="xs:string">
+            <xs:pattern value=".+:.+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TPACooldownMode">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="WhoTeleported"/>
+            <xs:pattern value="WhoInitiated"/>
+            <xs:pattern value="BothUsers"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Relation">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="OR"/>
+            <xs:pattern value="AND"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:attributeGroup name="teleportable">
+        <xs:attribute name="stand-still" type="xs:nonNegativeInteger" default="5"/>
+        <xs:attribute name="cooldown" type="xs:nonNegativeInteger" default="30"/>
+        <xs:attribute name="boss-bar" type="xs:string" default="purple"/>
+        <xs:attribute name="action-bar" type="stringBoolean" default="false"/>
+        <xs:attribute name="allow-back" type="stringBoolean" default="true"/>
+    </xs:attributeGroup>
+
+    <xs:group name="requirements">
+        <xs:sequence>
+            <xs:element name="Experience" minOccurs="0">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="consume" type="xs:string" default="true"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Items" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="identifier">
+                            <xs:attribute name="count" type="xs:string" use="required"/>
+                            <xs:attribute name="consume" type="xs:string" default="true"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Advancement" type="identifier" minOccurs="0"/>
+        </xs:sequence>
+    </xs:group>
+
+
+    <xs:element name="Locale">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="entry" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Teleportation">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="TPA" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="teleportable"/>
+                        <xs:attribute name="timeout" type="xs:nonNegativeInteger" default="60"/>
+                        <xs:attribute name="cooldown-mode" type="TPACooldownMode" default="WhoTeleported"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="RTP" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="teleportable"/>
+                        <xs:attribute name="cooldown" type="xs:nonNegativeInteger" default="120"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Spawn" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="teleportable"/>
+                        <xs:attribute name="cooldown" type="xs:nonNegativeInteger" default="120"/>
+                        <xs:attribute name="stand-still" type="xs:nonNegativeInteger" default="3"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Warps" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="teleportable"/>
+                        <xs:attribute name="stand-still" type="xs:nonNegativeInteger" default="3"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Back" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:group ref="requirements"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="teleportable"/>
+                        <xs:attribute name="stand-still" type="xs:nonNegativeInteger" default="5"/>
+                        <xs:attribute name="cooldown" type="xs:nonNegativeInteger" default="120"/>
+                        <xs:attribute name="cost" type="xs:string" use="required"/>
+                        <xs:attribute name="requirement-relation" type="Relation" default="OR"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Homes" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element name="Stage" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:group ref="requirements"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="requirement-relation" type="Relation" default="AND"/>
+                                    <xs:attribute name="to-get" type="xs:positiveInteger" use="required"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="AutoStage" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:group ref="requirements"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="requirement-relation" type="Relation" default="AND"/>
+                                    <xs:attribute name="starting-with" type="xs:positiveInteger" use="required"/>
+                                    <xs:attribute name="ending-with" type="xs:positiveInteger"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="allow-back" type="xs:string" default="true"/>
+                        <xs:attributeGroup ref="teleportable"/>
+                        <xs:attribute name="stand-still" type="xs:nonNegativeInteger" default="3"/>
+                        <xs:attribute name="starting" type="xs:nonNegativeInteger" use="required"/>
+                        <xs:attribute name="max" type="xs:positiveInteger" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="boss-bar" type="xs:string" default="purple"/>
+            <xs:attribute name="action-bar" type="stringBoolean" default="false"/>
+            <xs:attribute name="global-cooldown" type="stringBoolean" default="false"/>
+            <xs:attribute name="allow-back" type="stringBoolean" default="true"/>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:element name="CodedSMPUtils">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="Teleportation" minOccurs="0"/>
+                <xs:element name="PVP" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="default-state" type="stringBoolean" default="false"/>
+                        <xs:attribute name="stand-still" type="xs:nonNegativeInteger" default="3"/>
+                        <xs:attribute name="cooldown" type="xs:nonNegativeInteger" default="20"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Bottle" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="min-bottle" type="experience" default="0"/>
+                        <xs:attribute name="max-bottle" type="experience" default="50L"/>
+                        <xs:attribute name="cooldown" type="xs:nonNegativeInteger" default="0"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="AFK" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="time" type="xs:positiveInteger" default="300"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="NoMobGrief" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="Locale" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="wither" type="stringBoolean" default="true"/>
+                        <xs:attribute name="ghast" type="stringBoolean" default="true"/>
+                        <xs:attribute name="creeper" type="stringBoolean" default="true"/>
+                        <xs:attribute name="enderman" type="stringBoolean" default="true"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="disable-cdtf" type="stringBoolean" default="true"/>
+            <xs:attribute name="locale" type="xs:string" default="en"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

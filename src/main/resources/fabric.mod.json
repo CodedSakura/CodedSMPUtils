@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
-  "id": "fabric-smp-utils",
+  "id": "coded-smp-utils",
   "version": "${version}",
-  "name": "FabricSMPUtils",
+  "name": "CodedSMPUtils",
   "description": "",
   "authors": [],
   "contact": {
     "website": "http://mods.codedsakura.eu",
     "homepage": "http://codedsakura.eu",
-    "sources": "https://github.com/CodedSakura/FabricSMPUtils",
-    "repo": "https://github.com/CodedSakura/FabricSMPUtils",
-    "issues": "https://github.com/CodedSakura/FabricSMPUtils/issues"
+    "sources": "https://github.com/CodedSakura/CodedSMPUtils",
+    "repo": "https://github.com/CodedSakura/CodedSMPUtils",
+    "issues": "https://github.com/CodedSakura/CodedSMPUtils/issues"
   },
   "license": "ISC",
-  "icon": "assets/FabricSMPUtils/icon.png",
+  "icon": "assets/CodedSMPUtils/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "eu.codedsakura.fabricsmputils.FabricSMPUtils"
+      "eu.codedsakura.codedsmputils.CodedSMPUtils"
     ],
     "cardinal-components": [
-      "eu.codedsakura.fabricsmputils.SMPUtilCardinalComponents"
+      "eu.codedsakura.codedsmputils.SMPUtilCardinalComponents"
     ]
   },
   "mixins": [
-    "FabricSMPUtils.mixins.json"
+    "CodedSMPUtils.mixins.json"
   ],
   "custom": {
     "cardinal-components": [

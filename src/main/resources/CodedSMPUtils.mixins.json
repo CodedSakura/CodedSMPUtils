@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "eu.codedsakura.codedsmputils.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "plugin": "eu.codedsakura.codedsmputils.mixin.MixinConfigPlugin",
+  "mixins": [
+    "PVPMixin",
+    "TPMixin",
+    "nomobgrief.CreeperExplosionMixin",
+    "nomobgrief.EndermanBlockPickupMixin",
+    "nomobgrief.FireballExplosionMixin",
+    "nomobgrief.GoalSelectorAccessor",
+    "nomobgrief.PickUpBlockGoalDummy",
+    "nomobgrief.WitherSkullExplosionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

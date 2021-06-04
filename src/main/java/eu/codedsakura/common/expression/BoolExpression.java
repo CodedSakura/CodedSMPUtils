@@ -8,7 +8,7 @@ public class BoolExpression extends Expression<Boolean> {
         super(data);
     }
 
-    public Boolean getValue(Map<String, ?> variables) throws ScriptException {
+    public Boolean getValue(Map<String, ?> variables) {
         return Boolean.parseBoolean(super.getRawValue(variables).toString());
     }
 }

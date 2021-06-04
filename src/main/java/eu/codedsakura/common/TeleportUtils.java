@@ -3,6 +3,9 @@ package eu.codedsakura.common;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
+import net.minecraft.network.packet.s2c.play.ClearTitleS2CPacket;
+import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
+import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -12,7 +15,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 
-import static eu.codedsakura.fabricsmputils.FabricSMPUtils.L;
+import static eu.codedsakura.codedsmputils.CodedSMPUtils.L;
 
 public class TeleportUtils {
     private static final ArrayList<CounterRunnable> tasks = new ArrayList<>();
@@ -37,8 +40,8 @@ public class TeleportUtils {
         MinecraftServer server = who.server;
         final Vec3d[] lastPos = {who.getPos()};
 
-        bossBar = bossBar.toUpperCase();
-        boolean useBossBar = bossBar.equals("DISABLED");
+        bossBar = bossBar.toLowerCase();
+        boolean useBossBar = !bossBar.equals("disabled");
 
         CommandBossBar standStillBar = null;
         if (useBossBar) {
@@ -46,7 +49,7 @@ public class TeleportUtils {
             standStillBar.addPlayer(who);
             standStillBar.setColor(BossBar.Color.byName(bossBar));
         }
-        who.networkHandler.sendPacket(new TitleS2CPacket(0, 10, 5));
+        who.networkHandler.sendPacket(new TitleFadeS2CPacket(0, 10, 5));
         CommandBossBar finalStandStillBar = standStillBar;
         int standStillInTicks = (int) (standStillTime * 20);
 
@@ -64,7 +67,7 @@ public class TeleportUtils {
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            who.networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.RESET, null));
+                            who.networkHandler.sendPacket(new ClearTitleS2CPacket(true));
                         }
                     }, 500);
                     onCounterDone.run();
@@ -93,8 +96,8 @@ public class TeleportUtils {
                     who.sendMessage(lFallback(module, "action-bar.text", arguments), true);
                 }
 
-                who.networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.SUBTITLE, lFallback(module, "title.subtitle", arguments)));
-                who.networkHandler.sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, lFallback(module, "title.title", arguments)));
+                who.networkHandler.sendPacket(new SubtitleS2CPacket(lFallback(module, "title.subtitle", arguments)));
+                who.networkHandler.sendPacket(new TitleS2CPacket(lFallback(module, "title.title", arguments)));
             }
         });
     }

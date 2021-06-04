@@ -1,7 +1,7 @@
-# suppress inspection "UnusedProperty" for whole file
-base.config.failed=[red]Failed to reload the config! Please contact the server owner about this!
-base.config.partial=[yellow]Successfully reloaded the config, but some changes will be applied only after a restart!
-base.config.success=[green]Successfully reloaded the config!
+# suppress for whole file
+base.reload.failed=[red]Failed to reload the config! Please contact the server owner about this!
+base.reload.partial=[yellow]Successfully reloaded the config, but some changes will be applied only after a restart!
+base.reload.success=[green]Successfully reloaded the config!
 
 teleportation.boss-bar=
 teleportation.action-bar.text=[light_purple]Stand still for [gold]{$remaining}[/gold] more seconds
@@ -11,34 +11,34 @@ teleportation.title.title=[light_purple][bold]Teleporting!
 
 teleportation.tpa.to-self=[red]You cannot request to teleport to yourself!
 teleportation.tpa.already-exists=[red]There is already an ongoing request like this!
-teleportation.tpa.init.timed-out.from=[red]Your teleport request to [aqua]{$to-name}[/aqua] has timed out!
-teleportation.tpa.init.timed-out.to=[red]Teleport request from [aqua]{$from-name}[/aqua] has timed out!
-teleportation.tpa.init.request.from=[light_purple]You have requested to teleport to [aqua]{$to-name}[/aqua]\n\
-  To cancel type [gold][hover:show_text:'/tpacancel {$to-name}'][click:run_command:/tpacancel {$to-name}]/tpacancel \[<player>\][/click][/hover][/gold]\n\
-  This request will timeout in {$timout-length} seconds.
-teleportation.tpa.init.request.to=[light_purple][aqua]{$from-name}[/aqua] has requested to teleport to you!\n\
-  To accept type [gold][hover:show_text:'/tpaaccept {$to-name}'][click:run_command:/tpaaccept {$to-name}]/tpaaccept \[<player>\][/click][/hover][/gold]\n\
-  To deny type [gold][hover:show_text:'/tpadeny {$to-name}'][click:run_command:/tpadeny {$to-name}]/tpadeny \[<player>\][/click][/hover][/gold]\n\
-  This request will timeout in {$timout-length} seconds.
-teleportation.tpa.here.timed-out.to=[red]Your teleport request for {$from-name} to teleport to you has timed out!
-teleportation.tpa.here.timed-out.from=[red]Teleport request for you to teleport to {$to-name} has timed out!
-teleportation.tpa.here.request.to=[light_purple]You have requested for [aqua]{$from-name}[/aqua] to teleport to you!\n\
-  To cancel type [gold][hover:show_text:'/tpacancel {$to-name}'][click:run_command:/tpacancel {$to-name}]/tpacancel \[<player>\][/click][/hover][/gold]\n\
-  This request will timeout in {$timout-length} seconds.
-teleportation.tpa.here.request.from=[light_purple][aqua]{$from-name}[/aqua] has requested for you to teleport to them!\n\
-  To accept type [gold][hover:show_text:'/tpaaccept {$to-name}'][click:run_command:/tpaaccept {$to-name}]/tpaaccept \[<player>\][/click][/hover][/gold]\n\
-  To deny type [gold][hover:show_text:'/tpadeny {$to-name}'][click:run_command:/tpadeny {$to-name}]/tpadeny \[<player>\][/click][/hover][/gold]\n\
-  This request will timeout in {$timout-length} seconds.
+teleportation.tpa.init.timed-out.from=[red]Your teleport request to [aqua]{$to_name}[/aqua] has timed out!
+teleportation.tpa.init.timed-out.to=[red]Teleport request from [aqua]{$from_name}[/aqua] has timed out!
+teleportation.tpa.init.request.from=[light_purple]You have requested to teleport to [aqua]{$to_name}[/aqua]\n\
+  To cancel type [gold][hover:show_text:'/tpacancel {$to_name}'][click:run_command:/tpacancel {$to_name}]/tpacancel \[<player>\][/click][/hover][/gold]\n\
+  This request will timeout in {$timout_length} seconds.
+teleportation.tpa.init.request.to=[light_purple][aqua]{$from_name}[/aqua] has requested to teleport to you!\n\
+  To accept type [gold][hover:show_text:'/tpaaccept {$to_name}'][click:run_command:/tpaaccept {$to_name}]/tpaaccept \[<player>\][/click][/hover][/gold]\n\
+  To deny type [gold][hover:show_text:'/tpadeny {$to_name}'][click:run_command:/tpadeny {$to_name}]/tpadeny \[<player>\][/click][/hover][/gold]\n\
+  This request will timeout in {$timout_length} seconds.
+teleportation.tpa.here.timed-out.to=[red]Your teleport request for {$from_name} to teleport to you has timed out!
+teleportation.tpa.here.timed-out.from=[red]Teleport request for you to teleport to {$to_name} has timed out!
+teleportation.tpa.here.request.to=[light_purple]You have requested for [aqua]{$from_name}[/aqua] to teleport to you!\n\
+  To cancel type [gold][hover:show_text:'/tpacancel {$to_name}'][click:run_command:/tpacancel {$to_name}]/tpacancel \[<player>\][/click][/hover][/gold]\n\
+  This request will timeout in {$timout_length} seconds.
+teleportation.tpa.here.request.from=[light_purple][aqua]{$from_name}[/aqua] has requested for you to teleport to them!\n\
+  To accept type [gold][hover:show_text:'/tpaaccept {$to_name}'][click:run_command:/tpaaccept {$to_name}]/tpaaccept \[<player>\][/click][/hover][/gold]\n\
+  To deny type [gold][hover:show_text:'/tpadeny {$to_name}'][click:run_command:/tpadeny {$to_name}]/tpadeny \[<player>\][/click][/hover][/gold]\n\
+  This request will timeout in {$timout_length} seconds.
 teleportation.tpa.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
 teleportation.tpa.no-ongoing=[red]You currently don't have any teleport requests!
 teleportation.tpa.accept.multiple-ongoing=[red]You currently have multiple active teleport requests! Please specify whose request to accept.
 teleportation.tpa.accept.to=[light_purple]You have accepted the teleport request!
-teleportation.tpa.accept.from=[light_purple][aqua]{$req-to-name}[/aqua] has accepted the teleport request!
+teleportation.tpa.accept.from=[light_purple][aqua]{$req_to_name}[/aqua] has accepted the teleport request!
 teleportation.tpa.deny.multiple-ongoing=[red]You currently have multiple active teleport requests! Please specify whose request to deny.
 teleportation.tpa.deny.to=[red]You have cancelled the teleport request!
-teleportation.tpa.deny.from=[red][aqua]{$req-to-name}[/aqua] has cancelled the teleport request!
+teleportation.tpa.deny.from=[red][aqua]{$req_to_name}[/aqua] has cancelled the teleport request!
 teleportation.tpa.cancel.multiple-ongoing=[red]You currently have multiple active teleport requests! Please specify whose request to cancel.
-teleportation.tpa.cancel.to=[red][aqua]{$req-from-name}[/aqua] has cancelled the teleport request!
+teleportation.tpa.cancel.to=[red][aqua]{$req_from_name}[/aqua] has cancelled the teleport request!
 teleportation.tpa.cancel.from=[red]You have cancelled the teleport request!
 
 teleportation.rtp=
@@ -59,10 +59,22 @@ teleportation.warps.list.entry=\n  [hover:show_text:'\
   X: [gold]{$x}[/gold]; Y: [gold]{$y}[/gold]; Z: [gold]{$z}[/gold]\n\
   Yaw: [gold]{$yaw}[/gold]; Pitch: [gold]{$pitch}[/gold]\n\
   In: [gold]{$dimension}[/gold]\n\
-  ID: [gold]{$id-trunc}[/gold]\
+  ID: [gold]{$id_trunc}[/gold]\
   '][click:run_command:/warp "{$name}"][gold]{$name}
 teleportation.warps.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
 
+teleportation.back.no-location=[red]No destination!
+teleportation.back.error=[red]An error has occurred, please notify admins!
+teleportation.back.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
+teleportation.back.requirements.missing.and=[light_purple]Missing all:
+teleportation.back.requirements.missing.or=[light_purple]Missing any:
+teleportation.back.requirements.missing.entry.item=\n[{$fulfilled ? "green" : "red"}] - {$count}x [lang:{$locale_key}] ({$consume ? "consumed" : "not consumed"})
+teleportation.back.requirements.missing.entry.xp.levels=\n[{$fulfilled ? "green" : "red"}] - {$count} levels ({$consume ? "consumed" : "not consumed"})
+teleportation.back.requirements.missing.entry.xp.points=\n[{$fulfilled ? "green" : "red"}] - {$count} points ({$consume ? "consumed" : "not consumed"})
+teleportation.back.requirements.missing.entry.advancement=\n[{$fulfilled ? "green" : "red"}] -[hover:show_text:'[lang:{$locale_key_desc}]'] [lang:{$locale_key_title}]
+teleportation.back.requirements.consumed=[light_purple]Validated (& consumed) the following items/xp/advancements:
+# your items/xp has been consume
+teleportation.back.requirements=
 teleportation.back=
 
 teleportation.homes.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
@@ -74,7 +86,7 @@ teleportation.homes.add.could-not=[red]Could not add home (probably already exis
 teleportation.homes.remove.error=[red]Something went wrong removing the home!
 teleportation.homes.remove.success=[light_purple]Home [gold]{$name}[/gold] removed successfully!
 teleportation.homes.remove.could-not=[red]Could not remove home!
-teleportation.homes.list.header={$count}/{$max} homes:
+teleportation.homes.list.header={$home_count}/{$max} homes:
 teleportation.homes.list.entry=\n  [hover:show_text:'\
   [italic]Click to teleport![/italic]\n\
   Name: [gold]{$name}[/gold]\n\

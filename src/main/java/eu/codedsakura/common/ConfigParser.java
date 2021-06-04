@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.nio.file.Path;
 import java.util.*;
@@ -115,7 +116,8 @@ public class ConfigParser<T> {
      * @param <E> target class
      * @return parsed list
      */
-    private <E> List<E> parseList(Element[] nodes, Class<E> target) throws InstantiationException, IllegalAccessException, ConfigParserException {
+    private <E> List<E> parseList(Element[] nodes, Class<E> target)
+            throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         ArrayList<E> list = new ArrayList<>();
         for (Element node : nodes) {
             list.add(mapToClass(node, target));
@@ -162,8 +164,9 @@ public class ConfigParser<T> {
      * @param <R> resulting class
      * @return target class, populated with data
      */
-    private <R> R mapToClass(Element elem, Class<R> target) throws InstantiationException, IllegalAccessException, ConfigParserException {
-        R instance = target.newInstance();
+    private <R> R mapToClass(Element elem, Class<R> target)
+            throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        R instance = target.getDeclaredConstructor().newInstance();
 
         HashMap<Integer, HashMap<String, Boolean>> requiredGroups = new HashMap<>();
         for (Field field : getAllFields(new LinkedList<>(), target)) {
@@ -181,6 +184,7 @@ public class ConfigParser<T> {
 
                 if (elem.hasAttribute(key)) {
                     try {
+                        field.setAccessible(true);
                         field.set(instance, this.parseValue(elem.getAttribute(key), field.getType()));
                     } catch (Exception e) {
                         throw new ConfigParserException("Invalid value at '" + key + "' in element '" + elem.getTagName() + "'");
@@ -194,6 +198,7 @@ public class ConfigParser<T> {
                 }
 
                 try {
+                    field.setAccessible(true);
                     field.set(instance, this.parseValue(elem.getTextContent(), field.getType()));
                 } catch (Exception e) {
                     throw new ConfigParserException("Invalid child value in element '" + elem.getTagName() + "'");
@@ -224,7 +229,7 @@ public class ConfigParser<T> {
      * @param field field of target instance
      */
     private <R> void mapChildNode(R instance, Element elem, HashMap<Integer, HashMap<String, Boolean>> requiredGroups, Field field)
-            throws ConfigParserException, IllegalAccessException, InstantiationException {
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         boolean required = field.isAnnotationPresent(Required.class);
         String key = field.getAnnotation(ChildNode.class).value();
         boolean isList = field.getAnnotation(ChildNode.class).list();
@@ -251,8 +256,10 @@ public class ConfigParser<T> {
         if (isList) {
             ParameterizedType type = (ParameterizedType) field.getGenericType();
             Class<?> clazz = (Class<?>) type.getActualTypeArguments()[0];
+            field.setAccessible(true);
             field.set(instance, parseList(nodes, clazz));
         } else if (nodes.length > 0) {
+            field.setAccessible(true);
             field.set(instance, mapToClass(nodes[0], field.getType()));
         }
     }

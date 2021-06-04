@@ -1,18 +1,18 @@
 package eu.codedsakura.common.expression;
 
+import eu.codedsakura.common.exceptions.ExpressionException;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.Map;
 
 public abstract class Expression<T> {
-    protected final String data;
-    private final ScriptEngine engine;
+    private final String data;
+    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     public Expression(String data) {
         this.data = data;
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        engine = mgr.getEngineByName("JavaScript");
     }
 
     private String processVariable(Object variable) {
@@ -27,13 +27,18 @@ public abstract class Expression<T> {
         }
     }
 
-    protected Object getRawValue(Map<String, ?> variables) throws ScriptException {
+    protected Object getRawValue(Map<String, ?> variables) {
         final String[] finalData = {data};
 
         variables.entrySet().stream()
                 .filter(entry -> data.contains("$" + entry.getKey())) // make sure we're processing only the necessary variables
                 .forEach(entry -> finalData[0] = finalData[0].replaceAll("\\$" + entry.getKey() + "(?!\\w)", processVariable(entry.getValue())));
-        return engine.eval(finalData[0]);
+        try {
+            return engine.eval(finalData[0]);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+            throw new ExpressionException(finalData[0]);
+        }
     }
 
     abstract public T getValue(Map<String, ?> variables) throws ScriptException;

@@ -8,7 +8,7 @@ public class IntExpression extends Expression<Integer> {
         super(data);
     }
 
-    public Integer getValue(Map<String, ?> variables) throws ScriptException {
+    public Integer getValue(Map<String, ?> variables) {
         return Integer.parseInt(super.getRawValue(variables).toString());
     }
 }
