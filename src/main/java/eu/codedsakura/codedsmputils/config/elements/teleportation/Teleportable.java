@@ -12,7 +12,7 @@ public abstract class Teleportable {
     @Property("stand-still") public int standStill = 5;
     @Property public int cooldown = 30;
 
-    @Property("boss-bar") public String bossBar = "purple"; // null if off
+    @Property("boss-bar") public String bossBar = null;
     @Property("action-bar") public boolean actionBar = false;
     @Property("allow-back") public boolean allowBack = true;
 }

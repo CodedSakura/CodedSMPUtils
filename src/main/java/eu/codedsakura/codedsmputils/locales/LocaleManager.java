@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.script.ScriptException;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -36,7 +38,8 @@ public class LocaleManager {
             }
             inputStream = new FileInputStream(file);
         }
-        props.load(inputStream);
+        assert inputStream != null;
+        props.load(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
         for (Locale locale : config.locales)
             overrides.put("base." + locale.entry, locale.text);

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Teleportation {
     @ChildNode(value = "Locale", list = true) public ArrayList<Locale> locales = new ArrayList<>();
 
-    @Property("boss-bar") public String bossBar = "purple"; // off if off
+    @Property("boss-bar") public String bossBar = "purple"; // "disabled" if off
     @Property("action-bar") public boolean actionBar = false;
     @Property("global-cooldown") public boolean globalCooldown = false;
     @Property("allow-back") public boolean allowBack = true;

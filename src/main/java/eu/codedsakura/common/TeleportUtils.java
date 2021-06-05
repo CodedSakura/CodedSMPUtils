@@ -12,9 +12,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static eu.codedsakura.codedsmputils.CodedSMPUtils.CONFIG;
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.L;
 
 public class TeleportUtils {
@@ -35,12 +37,12 @@ public class TeleportUtils {
         return L.get(baseModule + entry, module + '.' + entry, args);
     }
 
-    public static void genericTeleport(String localeModule, String bossBar, Boolean actionBar, double standStillTime, ServerPlayerEntity who, Runnable onCounterDone) {
+    public static void genericTeleport(String localeModule, @Nullable String bossBar, Boolean actionBar, double standStillTime, ServerPlayerEntity who, Runnable onCounterDone) {
         final String module = localeModule.replaceAll("\\.+$", "") + '.';
         MinecraftServer server = who.server;
         final Vec3d[] lastPos = {who.getPos()};
 
-        bossBar = bossBar.toLowerCase();
+        bossBar = (bossBar != null ? bossBar : CONFIG.teleportation.bossBar).toLowerCase();
         boolean useBossBar = !bossBar.equals("disabled");
 
         CommandBossBar standStillBar = null;
