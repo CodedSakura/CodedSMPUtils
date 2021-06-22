@@ -12,7 +12,7 @@ import static eu.codedsakura.codedsmputils.CodedSMPUtils.CONFIG;
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.logger;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
-    private final int packageNameLength = this.getClass().getPackage().getName().length();
+    private final int packageNameLength = this.getClass().getPackage().getName().length() + 1;
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -45,6 +45,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
                     case "CreeperExplosionMixin":
                         return CONFIG.noMobGrief.creeper;
                     case "EndermanBlockPickupMixin":
+                    case "GoalSelectorAccessor":
+                    case "PickUpBlockGoalDummy":
                         return CONFIG.noMobGrief.enderman;
                     case "FireballExplosionMixin":
                         return CONFIG.noMobGrief.ghast;

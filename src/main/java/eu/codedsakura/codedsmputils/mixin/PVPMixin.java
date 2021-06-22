@@ -15,7 +15,7 @@ public class PVPMixin {
     private void testDamagePlayer(PlayerEntity player, CallbackInfoReturnable<Boolean> ci) {
         ServerPlayerEntity self = (ServerPlayerEntity) (Object) this;
 
-        ci.setReturnValue(PVP_DATA.get(self).isOn() && PVP_DATA.get(player).isOn());
-
+        if (!PVP_DATA.get(self).isOn() || !PVP_DATA.get(player).isOn())
+            ci.setReturnValue(false);
     }
 }

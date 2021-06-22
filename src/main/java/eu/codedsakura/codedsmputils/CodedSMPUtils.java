@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import eu.codedsakura.codedsmputils.config.elements.teleportation.homes.AutoStage;
 import eu.codedsakura.codedsmputils.config.elements.teleportation.homes.Stage;
 import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
+import eu.codedsakura.codedsmputils.modules.teleportation.rtp.RTP;
 import eu.codedsakura.codedsmputils.requirements.RequirementManager;
 import eu.codedsakura.common.ConfigParser;
 import eu.codedsakura.common.TeleportUtils;
@@ -78,7 +79,7 @@ public class CodedSMPUtils implements ModInitializer {
 //                .build();
 
 
-        // TODO /spawn, /rtp, /bottle, /afk, noMobGrief
+        // TODO /spawn, /bottle, /afk
         // CONSIDER /trade, pet transfer to other player /disown?
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
@@ -88,22 +89,23 @@ public class CodedSMPUtils implements ModInitializer {
                             .requires(Permissions.require("codedspmutils.main-command.config-reload", 3))
                             .executes(this::reloadConfig))
                     .then(literal("clear-cooldowns")
-                            .requires(Permissions.require("codedspmutils.main-command.config-reload", 2))
+                            .requires(Permissions.require("codedspmutils.main-command.clear-cooldowns", 2))
                             .executes(ctx -> CooldownManager.clearAll()))
                     .then(literal("debug")
-                        .then(literal("locale")
-                                .then(argument("name", StringArgumentType.greedyString())
-                                        .executes(ctx -> {
-                                            ctx.getSource().sendFeedback(new LiteralText(
-                                                    L.getEntry(StringArgumentType.getString(ctx, "name"), null)), false);
-                                            return 1;
-                                        })))
-                        .then(literal("text-parser")
-                                .then(argument("data", StringArgumentType.greedyString())
-                                        .executes(ctx -> {
-                                            ctx.getSource().sendFeedback(TextParser.parse(StringArgumentType.getString(ctx, "data")), false);
-                                            return 1;
-                                        })))));
+                            .requires(Permissions.require("codedspmutils.main-command.debug", 4))
+                            .then(literal("locale")
+                                    .then(argument("name", StringArgumentType.greedyString())
+                                            .executes(ctx -> {
+                                                ctx.getSource().sendFeedback(new LiteralText(
+                                                        L.getEntry(StringArgumentType.getString(ctx, "name"), null)), false);
+                                                return 1;
+                                            })))
+                            .then(literal("text-parser")
+                                    .then(argument("data", StringArgumentType.greedyString())
+                                            .executes(ctx -> {
+                                                ctx.getSource().sendFeedback(TextParser.parse(StringArgumentType.getString(ctx, "data")), false);
+                                                return 1;
+                                            })))));
 
 
             new TPA(dispatcher);
@@ -111,6 +113,7 @@ public class CodedSMPUtils implements ModInitializer {
             new Homes(dispatcher);
             new PVP(dispatcher);
             new Back(dispatcher);
+            new RTP(dispatcher);
         });
     }
 

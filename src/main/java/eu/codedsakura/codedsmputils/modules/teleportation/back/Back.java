@@ -57,7 +57,7 @@ public class Back {
 
     public static void addNewTeleport(TeleportLocation location) {
         if (CONFIG.teleportation == null || CONFIG.teleportation.back == null || !CONFIG.teleportation.allowBack) return;
-        teleports.removeIf(location1 -> location1.player == location.player);
+        teleports.removeIf(location1 -> location1.player.compareTo(location.player) == 0);
         teleports.add(location);
     }
 

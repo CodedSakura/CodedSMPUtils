@@ -11,7 +11,7 @@ Deeper look into the config at https://github.com/CodedSakura/CodedSMPUtils/wiki
 
         <TPA stand-still="5" cooldown="30" timeout="60" cooldown-mode="WhoInitiated"/>
 
-        <RTP stand-still="5" cooldown="120" action-bar="enabled" allow-back="false">
+        <RTP stand-still="5" cooldown="120" action-bar="enabled" allow-back="false" max-range="5000" min-range="2000">
             <Locale entry="action-bar-text">Randomly teleporting you in {$remaining} seconds!</Locale>
         </RTP>
 

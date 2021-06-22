@@ -217,7 +217,7 @@ public class TPA {
                 "teleportation.tpa", CONFIG.teleportation.tpa.bossBar, CONFIG.teleportation.tpa.actionBar, CONFIG.teleportation.tpa.standStill,
                 rFrom, () -> {
                     if (tr.tFrom.isRemoved() || tr.tTo.isRemoved()) tr.refreshPlayers();
-                    if (CONFIG.teleportation.warps.allowBack)
+                    if (CONFIG.teleportation.tpa.allowBack)
                         Back.addNewTeleport(new Back.TeleportLocation(tr.tFrom.getUuid(), Instant.now().getEpochSecond(),
                                 (ServerWorld) tr.tFrom.world, tr.tFrom.getX(), tr.tFrom.getY(), tr.tFrom.getZ(), tr.tFrom.getYaw(), tr.tFrom.getPitch()));
                     tr.tFrom.teleport(tr.tTo.getServerWorld(), tr.tTo.getX(), tr.tTo.getY(), tr.tTo.getZ(), tr.tTo.getYaw(), tr.tTo.getPitch());

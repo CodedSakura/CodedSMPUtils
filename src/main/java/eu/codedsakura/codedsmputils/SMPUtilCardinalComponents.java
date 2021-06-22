@@ -25,7 +25,7 @@ public class SMPUtilCardinalComponents implements WorldComponentInitializer, Ent
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.registerForPlayers(HOME_DATA, playerEntity -> new HomeDataComponent(), RespawnCopyStrategy.ALWAYS_COPY.ALWAYS_COPY);
+        registry.registerForPlayers(HOME_DATA, playerEntity -> new HomeDataComponent(), RespawnCopyStrategy.ALWAYS_COPY);
         registry.registerForPlayers(PVP_DATA, playerEntity -> new PvPComponent(), RespawnCopyStrategy.ALWAYS_COPY);
     }
 

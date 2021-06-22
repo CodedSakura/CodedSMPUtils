@@ -30,6 +30,18 @@
             <xs:pattern value="BothUsers"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="RTPAreaCenter">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="Player"/>
+            <xs:pattern value="Zero"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="RTPAreaShape">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="Circle"/>
+            <xs:pattern value="Square"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="Relation">
         <xs:restriction base="xs:string">
             <xs:pattern value="OR"/>
@@ -102,6 +114,10 @@
                         </xs:sequence>
                         <xs:attributeGroup ref="teleportable"/>
                         <xs:attribute name="cooldown" type="xs:nonNegativeInteger" default="120"/>
+                        <xs:attribute name="max-range" type="xs:nonNegativeInteger" use="required"/>
+                        <xs:attribute name="min-range" type="xs:nonNegativeInteger" default="0"/>
+                        <xs:attribute name="area-center" type="RTPAreaCenter" default="Zero"/>
+                        <xs:attribute name="area-shape" type="RTPAreaShape" default="Circle"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="Spawn" minOccurs="0">
