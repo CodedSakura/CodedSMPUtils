@@ -41,7 +41,9 @@ teleportation.tpa.cancel.multiple-ongoing=[red]You currently have multiple activ
 teleportation.tpa.cancel.to=[red][aqua]{$req_from_name}[/aqua] has cancelled the teleport request!
 teleportation.tpa.cancel.from=[red]You have cancelled the teleport request!
 
+teleportation.rtp.wait=[light_purple]Please wait while a suitable location is found!
 teleportation.rtp.failed=[red]Failed to find a safe spot!
+teleportation.rtp.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
 
 teleportation.spawn=
 

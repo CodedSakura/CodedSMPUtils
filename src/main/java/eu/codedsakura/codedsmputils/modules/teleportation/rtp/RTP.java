@@ -17,6 +17,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Random;
 
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.*;
@@ -30,36 +31,55 @@ public class RTP {
                 .executes(this::rtpInit));
     }
 
+    private boolean checkCooldown(ServerPlayerEntity tFrom) {
+        long remaining = CooldownManager.getCooldownTimeRemaining(RTP.class, tFrom.getUuid());
+        if (remaining > 0) {
+            tFrom.sendMessage(L.get("teleportation.rtp.cooldown",
+                    new HashMap<String, Long>() {{ put("remaining", remaining); }}), false);
+            return true;
+        }
+        return false;
+    }
+
     private int rtpInit(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         Random r = new Random();
         ServerPlayerEntity player = ctx.getSource().getPlayer();
+
+        if (checkCooldown(player)) return 1;
+        CooldownManager.addCooldown(RTP.class, player.getUuid(), CONFIG.teleportation.rtp.cooldown);
+
+        player.sendMessage(L.get("teleportation.rtp.wait"), false);
+
         ServerWorld world = ctx.getSource().getWorld();
-        int attempts = 100;
-        while (attempts > 0) {
-            BlockPos.Mutable blockPos = getNewCoords(r, world.getLogicalHeight(), player);
+        Thread runner = new Thread(() -> {
+            int attempts = 100;
+            while (attempts > 0) {
+                BlockPos.Mutable blockPos = getNewCoords(r, world.getLogicalHeight(), player);
 
-            boolean[] airHistory = new boolean[3];
-            BlockState blockState;
-            while (blockPos.getY() > world.getBottomY()) {
-                blockState = world.getBlockState(blockPos);
-                airHistory[2] = airHistory[1];
-                airHistory[1] = airHistory[0];
-                airHistory[0] = blockState.isAir();
+                boolean[] airHistory = new boolean[3];
+                BlockState blockState;
+                while (blockPos.getY() > world.getBottomY()) {
+                    blockState = world.getBlockState(blockPos);
+                    airHistory[2] = airHistory[1];
+                    airHistory[1] = airHistory[0];
+                    airHistory[0] = blockState.isAir();
 
-                if (!airHistory[0] && airHistory[1] && airHistory[2]) {
-                    if (checkAndTP(player, blockPos, blockState)) {
-                        return 0;
+                    if (!airHistory[0] && airHistory[1] && airHistory[2]) {
+                        if (checkAndTP(player, blockPos, blockState)) {
+                            return;
+                        }
+                        break;
                     }
-                    break;
+
+                    blockPos.move(Direction.DOWN);
                 }
-
-                blockPos.move(Direction.DOWN);
+                attempts--;
             }
-            attempts--;
-        }
 
-        ctx.getSource().sendFeedback(L.get("teleportation.rtp.failed"), false);
-        return 0;
+            ctx.getSource().sendFeedback(L.get("teleportation.rtp.failed"), false);
+        });
+        runner.start();
+        return 1;
     }
 
     private BlockPos.Mutable getNewCoords(Random r, double height, ServerPlayerEntity player) {
@@ -113,7 +133,6 @@ public class RTP {
                             Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
                                     (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
                         player.teleport(blockPos.getX() + .5, blockPos.getY() + 1, blockPos.getZ() + .5);
-                        CooldownManager.addCooldown(RTP.class, player.getUuid(), CONFIG.teleportation.rtp.cooldown);
                     });
             return true;
         }
