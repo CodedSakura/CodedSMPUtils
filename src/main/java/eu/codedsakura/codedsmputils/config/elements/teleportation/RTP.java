@@ -11,6 +11,9 @@ public class RTP extends Teleportable {
     @Required @Property("max-range") public int maxRange;
     @Property("min-range") public int minRange = 0;
 
+    @Property("whitelist-dims") public String whitelistDims = null;
+    @Property("blacklist-dims") public String blacklistDims = null;
+
     @Property("area-shape") public RTPAreaShape areaShape = RTPAreaShape.Circle;
     @Property("area-center") public RTPAreaCenter areaCenter = RTPAreaCenter.Zero;
 }

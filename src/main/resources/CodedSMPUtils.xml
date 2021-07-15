@@ -5,13 +5,14 @@ It makes it easier to overview the config & comment out lines (usually ctrl+/ or
 
 Deeper look into the config at https://github.com/CodedSakura/CodedSMPUtils/wiki
 -->
-<CodedSMPUtils xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CodedSMPUtils.xsd">
+<CodedSMPUtils>
     <Teleportation boss-bar="yellow" action-bar="disabled" global-cooldown="false" allow-back="true">
         <Locale entry="boss-bar">Teleporting...</Locale>
 
         <TPA stand-still="5" cooldown="30" timeout="60" cooldown-mode="WhoInitiated"/>
 
-        <RTP stand-still="5" cooldown="120" action-bar="enabled" allow-back="false" max-range="5000" min-range="2000">
+        <RTP stand-still="5" cooldown="120" action-bar="enabled" allow-back="false"
+                max-range="5000" min-range="2000" blacklist_dims="minecraft:the_end">
             <Locale entry="action-bar-text">Randomly teleporting you in {$remaining} seconds!</Locale>
         </RTP>
 
@@ -38,7 +39,7 @@ Deeper look into the config at https://github.com/CodedSakura/CodedSMPUtils/wiki
                 <Items count="3 * $home_count" consume="yes">minecraft:diamond</Items>
             </AutoStage>
             <AutoStage starting-with="4">
-                <Items count="1 * ($home_count - 3)" consume="false">minecraft:nether_star</Items>
+                <Items count="2 * ($home_count - 3)" consume="false">minecraft:nether_star</Items>
             </AutoStage>
         </Homes>
     </Teleportation>

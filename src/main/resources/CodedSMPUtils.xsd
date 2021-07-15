@@ -118,6 +118,8 @@
                         <xs:attribute name="min-range" type="xs:nonNegativeInteger" default="0"/>
                         <xs:attribute name="area-center" type="RTPAreaCenter" default="Zero"/>
                         <xs:attribute name="area-shape" type="RTPAreaShape" default="Circle"/>
+                        <xs:attribute name="whitelist-dim" type="xs:string"/>
+                        <xs:attribute name="blacklist-dim" type="xs:string"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="Spawn" minOccurs="0">

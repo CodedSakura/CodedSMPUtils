@@ -17,6 +17,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -28,7 +29,25 @@ public class RTP {
         dispatcher.register(literal("rtp")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.rtp != null)
                 .requires(Permissions.require("fabricspmutils.teleportation.rtp", true))
+                .requires(this::checkIfDimAllowed)
                 .executes(this::rtpInit));
+    }
+
+    private boolean checkIfDimAllowed(ServerCommandSource source) {
+        try {
+            String playerDim = source.getPlayer().getServerWorld().getRegistryKey().getValue().toString();
+            if (CONFIG.teleportation.rtp.blacklistDims != null) {
+                if (Arrays.stream(CONFIG.teleportation.rtp.blacklistDims.split(",")).anyMatch(s -> s.equalsIgnoreCase(playerDim))) {
+                    return false;
+                }
+            }
+            if (CONFIG.teleportation.rtp.whitelistDims != null) {
+                return Arrays.stream(CONFIG.teleportation.rtp.whitelistDims.split(",")).anyMatch(s -> s.equalsIgnoreCase(playerDim));
+            }
+            return true;
+        } catch (CommandSyntaxException e) {
+            return true;
+        }
     }
 
     private boolean checkCooldown(ServerPlayerEntity tFrom) {
@@ -48,7 +67,15 @@ public class RTP {
         if (checkCooldown(player)) return 1;
         CooldownManager.addCooldown(RTP.class, player.getUuid(), CONFIG.teleportation.rtp.cooldown);
 
-        player.sendMessage(L.get("teleportation.rtp.wait"), false);
+        Thread wait = new Thread(() -> {
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException ignored) {
+                return;
+            }
+            player.sendMessage(L.get("teleportation.rtp.wait"), false);
+        });
+        wait.start();
 
         ServerWorld world = ctx.getSource().getWorld();
         Thread runner = new Thread(() -> {
@@ -66,6 +93,7 @@ public class RTP {
 
                     if (!airHistory[0] && airHistory[1] && airHistory[2]) {
                         if (checkAndTP(player, blockPos, blockState)) {
+                            wait.interrupt();
                             return;
                         }
                         break;
