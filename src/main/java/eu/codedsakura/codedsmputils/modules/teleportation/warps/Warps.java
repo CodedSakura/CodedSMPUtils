@@ -168,6 +168,7 @@ public class Warps {
 
     private int warpTo(CommandContext<ServerCommandSource> ctx, String name) throws CommandSyntaxException {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
+        if (TeleportUtils.cantTeleport(player)) return 1;
         if (checkCooldown(player)) return 1;
         return warpTo(ctx, player, name);
     }

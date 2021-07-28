@@ -96,6 +96,8 @@ public class Back {
     private int back(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
+        if (TeleportUtils.cantTeleport(player)) return 1;
+
         List<TeleportLocation> locations = teleports.stream().filter(location -> location.player == player.getUuid()).collect(Collectors.toList());
         if (locations.size() == 0) {
             ctx.getSource().sendFeedback(L.get("teleportation.back.no-location"), false);

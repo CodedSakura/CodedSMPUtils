@@ -191,6 +191,8 @@ public class TPA {
     public int tpaAccept(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity rFrom) throws CommandSyntaxException {
         final ServerPlayerEntity rTo = ctx.getSource().getPlayer();
 
+        if (TeleportUtils.cantTeleport(rTo)) return 1;
+
         if (rFrom == null) {
             TPARequest[] candidates;
             candidates = activeTPA.stream().filter(tpaRequest -> tpaRequest.rTo.equals(rTo)).toArray(TPARequest[]::new);

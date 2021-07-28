@@ -97,6 +97,9 @@ public class Homes {
 
     int homeInit(CommandContext<ServerCommandSource> ctx, String name) throws CommandSyntaxException {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
+
+        if (TeleportUtils.cantTeleport(player)) return 1;
+
         if (name == null) name = "main";
 
         String finalName = name;

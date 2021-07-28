@@ -66,6 +66,7 @@ public class RTP {
         Random r = new Random();
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
+        if (TeleportUtils.cantTeleport(player)) return 1;
         if (checkCooldown(player)) return 1;
         CooldownManager.addCooldown(RTP.class, player.getUuid(), CONFIG.teleportation.rtp.cooldown);
 

@@ -33,8 +33,15 @@ public class TeleportUtils {
     private static Text lFallback(String module, String entry) {
         return L.get(baseModule + entry, module + '.' + entry);
     }
+
     private static Text lFallback(String module, String entry, Map<String, ?> args) {
         return L.get(baseModule + entry, module + '.' + entry, args);
+    }
+
+    public static boolean cantTeleport(ServerPlayerEntity who) {
+        if (tasks.stream().noneMatch(runnable -> runnable.player.compareTo(who.getUuid()) == 0)) return false;
+        who.sendMessage(L.get("base.ongoing"), false);
+        return true;
     }
 
     public static void genericTeleport(String localeModule, @Nullable String bossBar, Boolean actionBar, double standStillTime, ServerPlayerEntity who, Runnable onCounterDone) {
@@ -55,7 +62,7 @@ public class TeleportUtils {
         CommandBossBar finalStandStillBar = standStillBar;
         int standStillInTicks = (int) (standStillTime * 20);
 
-        tasks.add(new CounterRunnable(standStillInTicks) {
+        tasks.add(new CounterRunnable(standStillInTicks, who.getUuid()) {
             @Override
             void run() {
                 if (counter == 0) {
@@ -106,9 +113,11 @@ public class TeleportUtils {
 
     private abstract static class CounterRunnable {
         int counter;
+        UUID player;
 
-        CounterRunnable(int counter) {
+        CounterRunnable(int counter, UUID player) {
             this.counter = counter;
+            this.player = player;
         }
 
         void run() {

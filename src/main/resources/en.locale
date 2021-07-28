@@ -3,6 +3,7 @@ base.reload.failed=[red]Failed to reload the config! Please contact the server o
 base.reload.partial=[yellow]Successfully reloaded the config, but some changes will be applied only after a restart!
 base.reload.success=[green]Successfully reloaded the config!
 base.error=[red][bold]ERROR[/bold] An error has occurred! Please notify an administrator with details!
+base.ongoing=[red]There already is an ongoing teleport! [purple]Cancel it with [gold][click:run_command:'/tpcancel']/tpcancel[/click][/gold]!
 
 teleportation.boss-bar=
 teleportation.action-bar.text=[light_purple]Stand still for [gold]{$remaining}[/gold] more seconds
