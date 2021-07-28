@@ -1,0 +1,97 @@
+# proof of concept
+CodedSMPUtils:
+
+  Teleportation:
+    boss-bar: yellow
+    action-bar: disabled
+    global-cooldown: false
+    allow-back: true
+
+    Locale:
+      boss-bar: Teleporting...
+
+    TPA:
+      stand-still: 5
+      cooldown: 30
+      timeout: 60
+      cooldown-mode: WhoInitiated
+
+    RTP:
+      stand-still: 5
+      cooldown: 120
+      action-bar: enabled
+      allow-back: false
+      max-range: 5000
+      min-range: 2000
+      dimension-whitelist: [0, -1]
+
+      Locale:
+        action-bar-text: Randomly teleporting you in {$remaining} seconds
+
+    Spawn:
+      stand-still: 3
+      cooldown: 120
+      boss-bar: green
+
+    Warps:
+      stand-still: 3
+      cooldown: 30
+
+    Back:
+      stand-still: 5
+      cooldown: 120
+      cost: $seconds_since_teleport > 30
+      Locale:
+        reqirements.cost: <light_purple>Too long since teleport, items/exp/advancements required!
+      any:
+        experience:
+          levels: 1
+        items:
+          'minecraft:stick':
+            consume: 1
+          'minecraft:diamond':
+            require: 5
+        advancements:
+          - minecraft:adventure/kill_a_mob
+
+    Homes:
+      Stages:
+        - to-get: 2
+          all:
+            experience: 5L
+            items:
+              'minecraft:iron_pickaxe':
+                require: 1
+            advancements:
+              - minecraft:adventure/kill_a_mob
+      AutoStages:
+        - starting-with: 3
+          any:
+            experience: '{$home_count * 5}L'
+            items:
+              'minecraft:diamond':
+                 consume: $home_count * 3
+        - starting-with: 4
+          all:
+            items:
+              'minecraft:nether_star':
+                require: 2 * ($home_count - 3)
+
+
+  PVP:
+    default-state: off
+    stand-still: 3
+    cooldown: 20
+
+  Bottle:
+    max-bottle: 50L
+    min-bottle: 500
+    cooldown: 0
+
+  AFK:
+    time: 300
+
+  NoMobGrief:
+    disabled:
+      - wither
+

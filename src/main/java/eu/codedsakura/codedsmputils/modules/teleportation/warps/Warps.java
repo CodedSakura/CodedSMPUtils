@@ -8,10 +8,9 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
-import eu.codedsakura.codedsmputils.modules.teleportation.tpa.TPA;
+import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
 import eu.codedsakura.common.TeleportUtils;
 import eu.codedsakura.common.TextUtils;
-import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -21,7 +20,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.*;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
@@ -30,13 +30,13 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
-import static eu.codedsakura.codedsmputils.CodedSMPUtils.*;
+import static eu.codedsakura.codedsmputils.CodedSMPUtils.CONFIG;
+import static eu.codedsakura.codedsmputils.CodedSMPUtils.L;
 import static eu.codedsakura.codedsmputils.SMPUtilCardinalComponents.WARP_LIST;
 import static net.minecraft.command.argument.RotationArgumentType.getRotation;
 import static net.minecraft.command.argument.Vec3ArgumentType.getPosArgument;
@@ -56,20 +56,20 @@ public class Warps {
     public Warps(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("warp")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.warp", true))
+                .requires(Permissions.require("codedsmputils.teleportation.warp", true))
                 .then(argument("name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
                         .executes(ctx -> warpTo(ctx, getString(ctx, "name")))));
 
         dispatcher.register(literal("warps")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.warp", true))
+                .requires(Permissions.require("codedsmputils.teleportation.warp", true))
                 .executes(this::warpList)
                 .then(literal("list")
                         .executes(this::warpList)
                         .then(argument("dimension", DimensionArgumentType.dimension())
                                 .executes(ctx -> warpList(ctx, DimensionArgumentType.getDimensionArgument(ctx, "dimension")))))
                 .then(literal("add")
-                        .requires(Permissions.require("fabricspmutils.teleportation.warp.modify", 2))
+                        .requires(Permissions.require("codedsmputils.teleportation.warp.modify", 2))
                         .executes(ctx -> {throw new SimpleCommandExceptionType(new LiteralText("Provide a warp name!")).create();})
                         .then(argument("name", StringArgumentType.string())
                                 .executes(ctx -> warpAdd(ctx, getString(ctx, "name")))
@@ -80,19 +80,19 @@ public class Warps {
                                                 .then(argument("dimension", DimensionArgumentType.dimension())
                                                         .executes(ctx -> warpAdd(ctx, getString(ctx, "name"), getPosArgument(ctx, "position").toAbsolutePos(ctx.getSource()), getRotation(ctx, "rotation").toAbsoluteRotation(ctx.getSource()), DimensionArgumentType.getDimensionArgument(ctx, "dimension"))))))))
                 .then(literal("remove")
-                        .requires(Permissions.require("fabricspmutils.teleportation.warp.modify", 2))
+                        .requires(Permissions.require("codedsmputils.teleportation.warp.modify", 2))
                         .executes(ctx -> {throw new SimpleCommandExceptionType(new LiteralText("Provide a warp name!")).create();})
                         .then(argument("name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
                                 .executes(ctx -> warpRemove(ctx, getString(ctx, "name")))))
                 .then(literal("warp_player")
-                        .requires(Permissions.require("fabricspmutils.teleportation.warp.warp_player", 2))
+                        .requires(Permissions.require("codedsmputils.teleportation.warp.warp_player", 2))
                         .then(argument("player", EntityArgumentType.player())
                                 .then(argument("warp_name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
                                         .executes(ctx -> warpTo(ctx, EntityArgumentType.getPlayer(ctx, "player"), getString(ctx, "warp_name")))))));
     }
 
     private int warpRemove(CommandContext<ServerCommandSource> ctx, String name) throws CommandSyntaxException {
-        Pair<ServerWorld, Warp> warp = getAllWarps(ctx.getSource().getMinecraftServer()).stream()
+        Pair<ServerWorld, Warp> warp = getAllWarps(ctx.getSource().getServer()).stream()
                 .filter(v -> v.getRight().name.equals(name)).findFirst()
                 .orElseThrow(() -> new SimpleCommandExceptionType(L.get("teleportation.warps.invalid-name")).create());
 
@@ -122,7 +122,7 @@ public class Warps {
 
         HashMap<String, ?> arguments = new HashMap<String, Object>() {{ put("name", name); }};
 
-        if (getAllWarps(ctx.getSource().getMinecraftServer()).stream().anyMatch(w -> w.getRight().name.equalsIgnoreCase(name)))
+        if (getAllWarps(ctx.getSource().getServer()).stream().anyMatch(w -> w.getRight().name.equalsIgnoreCase(name)))
             throw new SimpleCommandExceptionType(L.get("teleportation.warps.add.already-exists", arguments)).create();
 
         Warp newWarp = new Warp(position, rotation, name, ctx.getSource().getPlayer().getUuid());
@@ -145,7 +145,7 @@ public class Warps {
     }
 
     private int warpList(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
-        ctx.getSource().getPlayer().sendMessage(TextUtils.join(StreamSupport.stream(ctx.getSource().getMinecraftServer().getWorlds().spliterator(), false)
+        ctx.getSource().getPlayer().sendMessage(TextUtils.join(StreamSupport.stream(ctx.getSource().getServer().getWorlds().spliterator(), false)
                 .map(this::warpListForDimension).collect(Collectors.toList()), new LiteralText("\n")), false);
 //                .reduce(LiteralText.EMPTY.copy(), (buff, elem) -> buff.append(elem).append("\n")), false);
         return 1;
@@ -173,7 +173,7 @@ public class Warps {
     }
 
     private int warpTo(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity player, String name) throws CommandSyntaxException {
-        Pair<ServerWorld, Warp> warp = getAllWarps(ctx.getSource().getMinecraftServer()).stream()
+        Pair<ServerWorld, Warp> warp = getAllWarps(ctx.getSource().getServer()).stream()
                 .filter(v -> v.getRight().name.equals(name)).findFirst()
                 .orElseThrow(() -> new SimpleCommandExceptionType(L.get("teleportation.warps.invalid-name")).create());
 
@@ -191,7 +191,7 @@ public class Warps {
 
     private CompletableFuture<Suggestions> getWarpSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) {
         String start = builder.getRemaining().toLowerCase();
-        getAllWarps(context.getSource().getMinecraftServer()).stream()
+        getAllWarps(context.getSource().getServer()).stream()
                 .map(v -> v.getRight().name)
                 .sorted(String::compareToIgnoreCase)
                 .filter(pair -> pair.toLowerCase().startsWith(start))

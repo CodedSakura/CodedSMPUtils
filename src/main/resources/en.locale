@@ -2,6 +2,7 @@
 base.reload.failed=[red]Failed to reload the config! Please contact the server owner about this!
 base.reload.partial=[yellow]Successfully reloaded the config, but some changes will be applied only after a restart!
 base.reload.success=[green]Successfully reloaded the config!
+base.error=[red][bold]ERROR[/bold] An error has occurred! Please notify an administrator with details!
 
 teleportation.boss-bar=
 teleportation.action-bar.text=[light_purple]Stand still for [gold]{$remaining}[/gold] more seconds
@@ -73,10 +74,17 @@ teleportation.back.requirements.missing.or=[light_purple]Missing any:
 teleportation.back.requirements.missing.entry.item=\n[{$fulfilled ? "green" : "red"}] - {$count}x [lang:{$locale_key}] ({$consume ? "consumed" : "not consumed"})
 teleportation.back.requirements.missing.entry.xp.levels=\n[{$fulfilled ? "green" : "red"}] - {$count} levels ({$consume ? "consumed" : "not consumed"})
 teleportation.back.requirements.missing.entry.xp.points=\n[{$fulfilled ? "green" : "red"}] - {$count} points ({$consume ? "consumed" : "not consumed"})
-teleportation.back.requirements.missing.entry.advancement=\n[{$fulfilled ? "green" : "red"}] -[hover:show_text:'[lang:{$locale_key_desc}]'] [lang:{$locale_key_title}]
+teleportation.back.requirements.missing.entry.advancement=\n[{$fulfilled ? "green" : "red"}] - Advancement [hover:show_text:'[lang:{$locale_key_desc}]'][lang:{$locale_key_title}]
 teleportation.back.requirements.consumed=[light_purple]Validated (& consumed) the following items/xp/advancements:
-# your items/xp has been consume
-teleportation.back.requirements=
+teleportation.back.requirements.cost=[red][bold]ERROR[/bold]: locale not found! Please contact server admin with a screenshot of this message!\n\
+  Caused by CodedSMPUtils, missing retrofill of locale entry [underline]Teleportation[/underline] > [underline]Back[/underline] > [italics]requirements.cost[/italics][/red]
+teleportation.back.requirements.choice.or=\n[light_purple]Choose what to consume (by clicking):
+teleportation.back.requirements.choice.entry.item=\n[yellow] - [hover:show_text:'[italic]Click to select'][underline]{$count}x [lang:{$locale_key}] (consumed)
+teleportation.back.requirements.choice.entry.xp.levels=\n[yellow] - [hover:show_text:'[italic]Click to select'][underline]{$count} levels (consumed)
+teleportation.back.requirements.choice.entry.xp.points=\n[yellow] - [hover:show_text:'[italic]Click to select'][underline]{$count} points (consumed)
+teleportation.back.requirements.choice.alt=\n[gray]Alternative options:
+teleportation.back.requirements.inventory-missing=[red]You no longer have the selected consumable!
+teleportation.back.requirements.inventory-changed=[red]
 teleportation.back=
 
 teleportation.homes.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!

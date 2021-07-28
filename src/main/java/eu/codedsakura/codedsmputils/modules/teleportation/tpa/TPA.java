@@ -6,8 +6,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
-import eu.codedsakura.common.TeleportUtils;
 import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
+import eu.codedsakura.common.TeleportUtils;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -38,33 +38,33 @@ public class TPA {
     public TPA(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("tpa")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
                         .executes(ctx -> tpaInit(ctx, getPlayer(ctx, "target")))));
 
         dispatcher.register(literal("tpahere")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
                         .executes(ctx -> tpaHere(ctx, getPlayer(ctx, "target")))));
 
         dispatcher.register(literal("tpaaccept")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
                         .executes(ctx -> tpaAccept(ctx, getPlayer(ctx, "target"))))
                 .executes(ctx -> tpaAccept(ctx, null)));
 
         dispatcher.register(literal("tpadeny")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
                         .executes(ctx -> tpaDeny(ctx, getPlayer(ctx, "target"))))
                 .executes(ctx -> tpaDeny(ctx, null)));
 
         dispatcher.register(literal("tpacancel")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPASenderSuggestions)
                         .executes(ctx -> tpaCancel(ctx, getPlayer(ctx, "target"))))
                 .executes(ctx -> tpaCancel(ctx, null)));
@@ -84,7 +84,7 @@ public class TPA {
                 activeTPA.stream().map(tpaRequest -> tpaRequest.rTo.getName().asString()),
                 activeTPA.stream().map(tpaRequest -> tpaRequest.rFrom.getName().asString())
         ).collect(Collectors.toList());
-        List<String> others = Arrays.stream(scs.getMinecraftServer().getPlayerNames())
+        List<String> others = Arrays.stream(scs.getServer().getPlayerNames())
                 .filter(s -> !s.equals(scs.getName()) && !activeTargets.contains(s))
                 .collect(Collectors.toList());
         return filterSuggestionsByInput(builder, others);

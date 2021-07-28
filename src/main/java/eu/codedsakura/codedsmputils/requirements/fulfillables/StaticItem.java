@@ -10,10 +10,12 @@ public class StaticItem extends Fulfillable {
     public boolean consume;
     public int count;
     public Item item;
+    private final String name;
 
     public StaticItem(boolean consume, String name, int count) {
         this.consume = consume;
         this.count = count;
+        this.name = name;
         this.item = Registry.ITEM.get(new Identifier(name));
     }
 
@@ -21,6 +23,7 @@ public class StaticItem extends Fulfillable {
         this.consume = consume;
         this.count = count;
         this.item = item;
+        this.name = Registry.ITEM.getId(item).toString();
     }
 
     @Override
@@ -37,5 +40,14 @@ public class StaticItem extends Fulfillable {
     public String getMissingLocale() {
         return "teleportation.back.requirements.missing.entry.item";
     }
-}
 
+    @Override
+    public String getChoiceLocale() {
+        return "teleportation.back.requirements.choice.entry.item";
+    }
+
+    @Override
+    public String getOriginalValue() {
+        return this.name;
+    }
+}

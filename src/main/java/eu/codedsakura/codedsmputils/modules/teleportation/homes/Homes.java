@@ -6,23 +6,23 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
-import eu.codedsakura.codedsmputils.modules.teleportation.tpa.TPA;
-import eu.codedsakura.common.TeleportUtils;
 import eu.codedsakura.codedsmputils.config.CodedSMPUtilsConfig;
+import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
 import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
+import eu.codedsakura.common.TeleportUtils;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.*;
+import net.minecraft.text.MutableText;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 
-import javax.script.ScriptException;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.*;
@@ -34,37 +34,37 @@ public class Homes {
     public Homes(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("home")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.homes", true))
+                .requires(Permissions.require("codedsmputils.teleportation.homes", true))
                 .executes(ctx -> homeInit(ctx, null))
                 .then(argument("name", StringArgumentType.greedyString()).suggests(this::getHomeSuggestions)
                         .executes(ctx -> homeInit(ctx, StringArgumentType.getString(ctx, "name")))));
 
         dispatcher.register(literal("sethome")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.homes.edit", true))
+                .requires(Permissions.require("codedsmputils.teleportation.homes.edit", true))
                 .executes(ctx -> homeSet(ctx, null))
                 .then(argument("name", StringArgumentType.greedyString())
                         .executes(ctx -> homeSet(ctx, StringArgumentType.getString(ctx, "name")))));
 
         dispatcher.register(literal("delhome")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.homes.edit", true))
+                .requires(Permissions.require("codedsmputils.teleportation.homes.edit", true))
                         .then(argument("name", StringArgumentType.greedyString()).suggests(this::getHomeSuggestions)
                                 .executes(ctx -> homeDel(ctx, StringArgumentType.getString(ctx, "name")))));
 
         dispatcher.register(literal("homes")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.homes", true))
+                .requires(Permissions.require("codedsmputils.teleportation.homes", true))
                 .executes(this::homeList)
                 .then(literal("list")
                         .executes(this::homeList)
                         .then(argument("player", EntityArgumentType.player())
-                                .requires(Permissions.require("fabricspmutils.teleportation.homes.list-player", 2))
+                                .requires(Permissions.require("codedsmputils.teleportation.homes.list-player", 2))
                                 .executes(ctx -> homeList(ctx, EntityArgumentType.getPlayer(ctx, "player")))))
                 .then(literal("gui").requires(req -> false)
                         .executes(ctx -> 0)) // TODO
                 .then(literal("delete")
-                        .requires(Permissions.require("fabricspmutils.teleportation.homes.edit", true))
+                        .requires(Permissions.require("codedsmputils.teleportation.homes.edit", true))
                         .then(argument("name", StringArgumentType.greedyString()).suggests(this::getHomeSuggestions)
                                 .executes(ctx -> homeDel(ctx, StringArgumentType.getString(ctx, "name"))))));
 
@@ -123,7 +123,7 @@ public class Homes {
                         Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
                                 (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
 
-                    ServerWorld world = ctx.getSource().getMinecraftServer().getWorld(RegistryKey.of(Registry.WORLD_KEY, home.get().getDimID()));
+                    ServerWorld world = ctx.getSource().getServer().getWorld(RegistryKey.of(Registry.WORLD_KEY, home.get().getDimID()));
                     player.teleport(world, home.get().getX(), home.get().getY(), home.get().geyZ(), home.get().getYaw(), home.get().getPitch());
                     CooldownManager.addCooldown(Homes.class, player.getUuid(), CONFIG.teleportation.homes.cooldown);
                 });

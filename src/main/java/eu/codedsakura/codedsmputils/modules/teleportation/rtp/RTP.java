@@ -25,10 +25,12 @@ import static eu.codedsakura.codedsmputils.CodedSMPUtils.*;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class RTP {
+    private static final int MAX_ATTEMPTS = 100;
+
     public RTP(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("rtp")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.rtp != null)
-                .requires(Permissions.require("fabricspmutils.teleportation.rtp", true))
+                .requires(Permissions.require("codedsmputils.teleportation.rtp", true))
                 .requires(this::checkIfDimAllowed)
                 .executes(this::rtpInit));
     }
@@ -78,9 +80,10 @@ public class RTP {
         wait.start();
 
         ServerWorld world = ctx.getSource().getWorld();
+        final long timeStart = System.currentTimeMillis();
         Thread runner = new Thread(() -> {
-            int attempts = 100;
-            while (attempts > 0) {
+            int attempts = 0;
+            while (attempts < MAX_ATTEMPTS) {
                 BlockPos.Mutable blockPos = getNewCoords(r, world.getLogicalHeight(), player);
 
                 boolean[] airHistory = new boolean[3];
@@ -94,6 +97,8 @@ public class RTP {
                     if (!airHistory[0] && airHistory[1] && airHistory[2]) {
                         if (checkAndTP(player, blockPos, blockState)) {
                             wait.interrupt();
+                            logger.info("[CSMPU] RTP took {} attempt(s), {} millisecond(s)",
+                                    attempts, System.currentTimeMillis() - timeStart);
                             return;
                         }
                         break;
@@ -101,7 +106,7 @@ public class RTP {
 
                     blockPos.move(Direction.DOWN);
                 }
-                attempts--;
+                attempts++;
             }
 
             ctx.getSource().sendFeedback(L.get("teleportation.rtp.failed"), false);

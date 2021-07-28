@@ -5,7 +5,6 @@ import net.minecraft.advancement.AdvancementDisplay;
 import net.minecraft.text.TranslatableText;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 public class FAdvancement extends Fulfillable {
     public Advancement advancement;
@@ -17,6 +16,16 @@ public class FAdvancement extends Fulfillable {
     @Override
     public String getMissingLocale() {
         return "teleportation.back.requirements.missing.entry.advancement";
+    }
+
+    @Override
+    public String getChoiceLocale() {
+        return null;
+    }
+
+    @Override
+    public String getOriginalValue() {
+        return null;
     }
 
     @Override

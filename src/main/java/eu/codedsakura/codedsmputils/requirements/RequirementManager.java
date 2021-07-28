@@ -19,6 +19,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static eu.codedsakura.codedsmputils.CodedSMPUtils.L;
+import static eu.codedsakura.codedsmputils.CodedSMPUtils.logger;
+
 public class RequirementManager {
     private final ServerPlayerEntity player;
     private final Relation relation;
@@ -136,29 +139,94 @@ public class RequirementManager {
                 return false;
         }
 
-        consumeItems.forEach(staticItem -> player.getInventory().remove(
-                itemStack -> itemStack.getItem().equals(staticItem.item),
-                staticItem.count, player.playerScreenHandler.getCraftingInput()));
+        consumeItems.forEach(staticItem -> {
+            player.getInventory().remove(
+                    itemStack -> itemStack.getItem().equals(staticItem.item),
+                    staticItem.count, player.playerScreenHandler.getCraftingInput());
+            staticItem.consumed = true;
+        });
 
         if (xp.consume) {
-            switch (xp.type) {
-                case LEVELS:
-                    player.addExperienceLevels(-xp.value);
-                    break;
-                case POINTS:
-                    player.addExperience(-xp.value);
-                    break;
-            }
+            xp.removeFromPlayer(player);
+            xp.consumed = true;
         }
         return true;
     }
 
-    public List<Fulfillable> getAll() {
+    // record of sanity checks: 5
+    public boolean consumeSpecific(String type, String value) {
+        if (consume()) return true;
+
+        switch (type) {
+            case "item":
+                List<StaticItem> options = consumeItems.stream().filter(item -> item.getOriginalValue().equals(value))
+                        .collect(Collectors.toList());
+                if (options.size() > 1) {
+                    player.sendMessage(L.get("base.error"), false);
+                    logger.error("[CSMPU] [/back | step 2] repeated item '{}'", value);
+                    return false;
+                }
+
+                if (options.size() < 1) {
+                    player.sendMessage(L.get("base.error"), false);
+                    logger.error("[CSMPU] [/back | step 2] missing item definition '{}'", value);
+                    return false;
+                }
+
+                StaticItem item = options.get(0);
+                player.getInventory().remove(
+                        itemStack -> itemStack.getItem().equals(item.item),
+                        item.count, player.playerScreenHandler.getCraftingInput());
+                item.consumed = true;
+                break;
+
+            case "xp":
+                if (!xp.consume) {
+                    player.sendMessage(L.get("base.error"), false);
+                    logger.error("[CSMPU] [/back | step 2] xp not supposed to be consumed");
+                    return false;
+                }
+
+                if (!value.equalsIgnoreCase(xp.getOriginalValue())) {
+                    player.sendMessage(L.get("base.error"), false);
+                    logger.error("[CSMPU] [/back | step 2] mismatched xp values '{}' and '{}'", value, xp.getOriginalValue());
+                    return false;
+                }
+
+                xp.removeFromPlayer(player);
+                xp.consumed = true;
+                break;
+
+            default:
+                player.sendMessage(L.get("base.error"), false);
+                logger.error("[CSMPU] [/back | step 2] unknown type '{}'", type);
+                return false;
+        }
+        return true;
+    }
+
+    private Stream<Fulfillable> getAllStream() {
         return Stream.concat(
                 Stream.of(haveItems, consumeItems, advancements)
                         .flatMap(Collection::stream),
                 Stream.of(xp)
-        ).collect(Collectors.toList());
+        );
+    }
+
+    public List<Fulfillable> getAll() {
+        return getAllStream().collect(Collectors.toList());
+    }
+
+    public List<Fulfillable> getFulfilled() {
+        return getAllStream().filter(f -> f.fulfilled).collect(Collectors.toList());
+    }
+
+    public List<Fulfillable> getUnfulfilled() {
+        return getAllStream().filter(f -> !f.fulfilled).collect(Collectors.toList());
+    }
+
+    public List<Fulfillable> getConsumed() {
+        return getAllStream().filter(f -> f.consumed).collect(Collectors.toList());
     }
 
     public static void verifyRequirements(Requirements req, MinecraftServer server) {

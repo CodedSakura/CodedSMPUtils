@@ -21,17 +21,17 @@ public class PVP {
     public PVP(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("pvp")
             .requires(source -> CONFIG.pvp != null)
-            .requires(Permissions.require("fabricspmutils.pvp", true))
+            .requires(Permissions.require("codedsmputils.pvp", true))
             .executes(this::togglePvP)
             .then(literal("on")
                     .executes(ctx -> this.setPvP(ctx, true))
                     .then(argument("players", EntityArgumentType.players())
-                            .requires(Permissions.require("fabricspmutils.pvp.others", 2))
+                            .requires(Permissions.require("codedsmputils.pvp.others", 2))
                             .executes(ctx -> this.setPvP(ctx, true, EntityArgumentType.getPlayers(ctx, "players")))))
             .then(literal("off")
                     .executes(ctx -> this.setPvP(ctx, false))
                     .then(argument("players", EntityArgumentType.players())
-                            .requires(Permissions.require("fabricspmutils.pvp.others", 2))
+                            .requires(Permissions.require("codedsmputils.pvp.others", 2))
                             .executes(ctx -> this.setPvP(ctx, false, EntityArgumentType.getPlayers(ctx, "players"))))));
     }
 
