@@ -85,9 +85,8 @@ teleportation.back.requirements.choice.entry.xp.levels=\n[yellow] - [hover:show_
 teleportation.back.requirements.choice.entry.xp.points=\n[yellow] - [hover:show_text:'[italic]Click to select'][underline]{$count} points (consumed)
 teleportation.back.requirements.choice.alt=\n[gray]Alternative options:
 teleportation.back.requirements.inventory-missing=[red]You no longer have the selected consumable!
-teleportation.back.requirements.inventory-changed=[red]
-teleportation.back=
-
+teleportation.back.requirements.inventory-changed=[red]You no longer can satisfy any of the requirements!
+teleportation.last-death.no-location=[red]You don't have a recorded point of death!
 teleportation.homes.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
 teleportation.homes.not-exists=[red]This home does not exist!
 teleportation.homes.limit=[red]Home limit reached!

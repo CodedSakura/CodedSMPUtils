@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "plugin": "eu.codedsakura.codedsmputils.mixin.MixinConfigPlugin",
   "mixins": [
+    "DeathMixin",
     "PVPMixin",
     "TPMixin",
     "nomobgrief.CreeperExplosionMixin",

@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
+import eu.codedsakura.codedsmputils.modules.teleportation.lastdeath.LastDeath;
 import eu.codedsakura.codedsmputils.requirements.Relation;
 import eu.codedsakura.codedsmputils.requirements.RequirementManager;
 import eu.codedsakura.codedsmputils.requirements.fulfillables.FAdvancement;
@@ -97,6 +98,23 @@ public class Back {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
         if (TeleportUtils.cantTeleport(player)) return 1;
+
+        if (CONFIG.teleportation.back.allowDeathPoint) {
+            Optional<Long> maxBack = teleports.stream()
+                    .filter(loc -> loc.player.compareTo(player.getUuid()) == 0)
+                    .map(loc -> loc.time).max(Long::compareTo);
+            if (!maxBack.isPresent()) {
+                if (LastDeath.deaths.containsKey(player.getUuid())) {
+                    return LastDeath.run(ctx);
+                } // else continue
+            } else {
+                if (LastDeath.deaths.containsKey(player.getUuid())) {
+                    if (maxBack.get() < LastDeath.deaths.get(player.getUuid()).time) {
+                        return LastDeath.run(ctx);
+                    } // else continue
+                } // else continue
+            }
+        }
 
         List<TeleportLocation> locations = teleports.stream().filter(location -> location.player == player.getUuid()).collect(Collectors.toList());
         if (locations.size() == 0) {

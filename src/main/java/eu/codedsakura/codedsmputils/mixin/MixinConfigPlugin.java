@@ -35,6 +35,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
                     return CONFIG.pvp != null;
                 case "TPMixin":
                     return CONFIG.disableCrossDimTPFix;
+                case "DeathMixin":
+                    return true;
             }
         } else if (mixin.length == 2) {
             String packageName = mixin[0];

@@ -1,9 +1,9 @@
 package eu.codedsakura.codedsmputils.config.elements.teleportation;
 
-import eu.codedsakura.common.annotations.ChildNode;
-import eu.codedsakura.common.annotations.Property;
 import eu.codedsakura.codedsmputils.config.elements.Locale;
 import eu.codedsakura.codedsmputils.config.elements.teleportation.homes.Homes;
+import eu.codedsakura.common.annotations.ChildNode;
+import eu.codedsakura.common.annotations.Property;
 
 import java.util.ArrayList;
 
@@ -20,5 +20,8 @@ public class Teleportation {
     @ChildNode("Spawn") public Spawn spawn = null;
     @ChildNode("Warps") public Warps warps = null;
     @ChildNode("Back") public Back back = null;
-    @ChildNode("Homes") public Homes homes = null;
+    @ChildNode("Homes")
+    public Homes homes = null;
+    @ChildNode("LastDeath")
+    public LastDeath lastDeath = null;
 }
