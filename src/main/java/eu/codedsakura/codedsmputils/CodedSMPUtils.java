@@ -2,20 +2,21 @@ package eu.codedsakura.codedsmputils;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import eu.codedsakura.codedsmputils.config.CodedSMPUtilsConfig;
 import eu.codedsakura.codedsmputils.config.elements.teleportation.homes.AutoStage;
 import eu.codedsakura.codedsmputils.config.elements.teleportation.homes.Stage;
+import eu.codedsakura.codedsmputils.locales.LocaleManager;
+import eu.codedsakura.codedsmputils.modules.pvp.PVP;
 import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
+import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
+import eu.codedsakura.codedsmputils.modules.teleportation.homes.Homes;
+import eu.codedsakura.codedsmputils.modules.teleportation.lastdeath.LastDeath;
 import eu.codedsakura.codedsmputils.modules.teleportation.rtp.RTP;
+import eu.codedsakura.codedsmputils.modules.teleportation.tpa.TPA;
+import eu.codedsakura.codedsmputils.modules.teleportation.warps.Warps;
 import eu.codedsakura.codedsmputils.requirements.RequirementManager;
 import eu.codedsakura.common.ConfigParser;
 import eu.codedsakura.common.TeleportUtils;
-import eu.codedsakura.codedsmputils.config.CodedSMPUtilsConfig;
-import eu.codedsakura.codedsmputils.locales.LocaleManager;
-import eu.codedsakura.codedsmputils.modules.pvp.PVP;
-import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
-import eu.codedsakura.codedsmputils.modules.teleportation.homes.Homes;
-import eu.codedsakura.codedsmputils.modules.teleportation.tpa.TPA;
-import eu.codedsakura.codedsmputils.modules.teleportation.warps.Warps;
 import eu.pb4.placeholders.TextParser;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.api.ModInitializer;
@@ -114,6 +115,7 @@ public class CodedSMPUtils implements ModInitializer {
             new PVP(dispatcher);
             new Back(dispatcher);
             new RTP(dispatcher);
+            LastDeath.commands(dispatcher);
         });
     }
 

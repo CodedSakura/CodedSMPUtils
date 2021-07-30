@@ -10,16 +10,25 @@ import java.util.ArrayList;
 public class Teleportation {
     @ChildNode(value = "Locale", list = true) public ArrayList<Locale> locales = new ArrayList<>();
 
-    @Property("boss-bar") public String bossBar = "purple"; // "disabled" if off
-    @Property("action-bar") public boolean actionBar = false;
-    @Property("global-cooldown") public boolean globalCooldown = false;
-    @Property("allow-back") public boolean allowBack = true;
+    @Property("boss-bar")
+    public String bossBar = "purple"; // "disabled" if off
+    @Property("action-bar")
+    public boolean actionBar = false;
+    @Property("global-cooldown")
+    public boolean globalCooldown = false;
+    @Property("allow-back")
+    public boolean allowBack = true;
 
-    @ChildNode("TPA") public TPA tpa = null;
-    @ChildNode("RTP") public RTP rtp = null;
-    @ChildNode("Spawn") public Spawn spawn = null;
-    @ChildNode("Warps") public Warps warps = null;
-    @ChildNode("Back") public Back back = null;
+    @ChildNode("TPA")
+    public TPA tpa = null;
+    @ChildNode("RTP")
+    public RTP rtp = null;
+    @ChildNode("Spawn")
+    public Spawn spawn = null;
+    @ChildNode("Warps")
+    public Warps warps = null;
+    @ChildNode("Back")
+    public Back back = null;
     @ChildNode("Homes")
     public Homes homes = null;
     @ChildNode("LastDeath")

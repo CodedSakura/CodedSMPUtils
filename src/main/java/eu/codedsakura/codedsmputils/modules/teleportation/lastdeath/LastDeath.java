@@ -25,17 +25,31 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class LastDeath {
     public static HashMap<UUID, DeathPoint> deaths = new HashMap<>();
 
-    public LastDeath(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void commands(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("lastdeath")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.lastDeath != null)
                 .requires(Permissions.require("codedsmputils.teleportation.last-death", true))
                 .executes(LastDeath::run));
     }
 
+    private static boolean checkCooldown(ServerPlayerEntity tFrom) {
+        long remaining = CooldownManager.getCooldownTimeRemaining(LastDeath.class, tFrom.getUuid());
+        if (remaining > 0) {
+            tFrom.sendMessage(L.get("teleportation.last-death.cooldown",
+                    new HashMap<String, Long>() {{
+                        put("remaining", remaining);
+                    }}), false);
+            return true;
+        }
+        return false;
+    }
+
     public static int run(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
         if (TeleportUtils.cantTeleport(player)) return 1;
+
+        if (checkCooldown(player)) return 1;
 
         if (!LastDeath.deaths.containsKey(player.getUuid())) {
             ctx.getSource().sendFeedback(L.get("teleportation.last-death.no-location"), false);

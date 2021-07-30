@@ -11,7 +11,8 @@ import eu.codedsakura.common.expression.BoolExpression;
 import java.util.ArrayList;
 
 public class Back extends Requirements {
-    @ChildNode(value = "Locale", list = true) public ArrayList<Locale> locales = new ArrayList<>();
+    @ChildNode(value = "Locale", list = true)
+    public ArrayList<Locale> locales = new ArrayList<>();
 
     @Property("stand-still")
     public int standStill = 5;
