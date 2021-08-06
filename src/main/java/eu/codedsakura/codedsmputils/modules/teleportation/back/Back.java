@@ -74,8 +74,8 @@ public class Back {
 
     public Back(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("back")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.back != null)
-                .requires(Permissions.require("codedsmputils.teleportation.back", true))
+                .requires(Permissions.require("codedsmputils.teleportation.back", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.back != null))
                 .executes(this::back)
                 .then(literal("fulfill")
                         .requires(this::needsToFulfill)

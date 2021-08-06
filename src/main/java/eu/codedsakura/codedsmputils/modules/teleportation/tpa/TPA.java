@@ -37,34 +37,34 @@ public class TPA {
 
     public TPA(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("tpa")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
                         .executes(ctx -> tpaInit(ctx, getPlayer(ctx, "target")))));
 
         dispatcher.register(literal("tpahere")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPAInitSuggestions)
                         .executes(ctx -> tpaHere(ctx, getPlayer(ctx, "target")))));
 
         dispatcher.register(literal("tpaaccept")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
                         .executes(ctx -> tpaAccept(ctx, getPlayer(ctx, "target"))))
                 .executes(ctx -> tpaAccept(ctx, null)));
 
         dispatcher.register(literal("tpadeny")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPATargetSuggestions)
                         .executes(ctx -> tpaDeny(ctx, getPlayer(ctx, "target"))))
                 .executes(ctx -> tpaDeny(ctx, null)));
 
         dispatcher.register(literal("tpacancel")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("codedsmputils.teleportation.tpa", true))
+                .requires(Permissions.require("codedsmputils.teleportation.tpa", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null))
                 .then(argument("target", EntityArgumentType.player()).suggests(this::getTPASenderSuggestions)
                         .executes(ctx -> tpaCancel(ctx, getPlayer(ctx, "target"))))
                 .executes(ctx -> tpaCancel(ctx, null)));

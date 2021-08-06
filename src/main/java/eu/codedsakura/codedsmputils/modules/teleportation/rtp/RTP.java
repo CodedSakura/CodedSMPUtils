@@ -29,8 +29,8 @@ public class RTP {
 
     public RTP(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("rtp")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.rtp != null)
-                .requires(Permissions.require("codedsmputils.teleportation.rtp", true))
+                .requires(Permissions.require("codedsmputils.teleportation.rtp", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.rtp != null))
                 .requires(this::checkIfDimAllowed)
                 .executes(this::rtpInit));
     }

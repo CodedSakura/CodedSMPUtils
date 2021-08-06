@@ -55,14 +55,14 @@ public class Warps {
 
     public Warps(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("warp")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("codedsmputils.teleportation.warp", true))
+                .requires(Permissions.require("codedsmputils.teleportation.warp", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null))
                 .then(argument("name", StringArgumentType.string()).suggests(this::getWarpSuggestions)
                         .executes(ctx -> warpTo(ctx, getString(ctx, "name")))));
 
         dispatcher.register(literal("warps")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null)
-                .requires(Permissions.require("codedsmputils.teleportation.warp", true))
+                .requires(Permissions.require("codedsmputils.teleportation.warp", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.tpa != null))
                 .executes(this::warpList)
                 .then(literal("list")
                         .executes(this::warpList)

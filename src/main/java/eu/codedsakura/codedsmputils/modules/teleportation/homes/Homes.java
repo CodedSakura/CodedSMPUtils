@@ -33,28 +33,28 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class Homes {
     public Homes(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("home")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
-                .requires(Permissions.require("codedsmputils.teleportation.homes", true))
+                .requires(Permissions.require("codedsmputils.teleportation.homes", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null))
                 .executes(ctx -> homeInit(ctx, null))
                 .then(argument("name", StringArgumentType.greedyString()).suggests(this::getHomeSuggestions)
                         .executes(ctx -> homeInit(ctx, StringArgumentType.getString(ctx, "name")))));
 
         dispatcher.register(literal("sethome")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
-                .requires(Permissions.require("codedsmputils.teleportation.homes.edit", true))
+                .requires(Permissions.require("codedsmputils.teleportation.homes.edit", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null))
                 .executes(ctx -> homeSet(ctx, null))
                 .then(argument("name", StringArgumentType.greedyString())
                         .executes(ctx -> homeSet(ctx, StringArgumentType.getString(ctx, "name")))));
 
         dispatcher.register(literal("delhome")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
-                .requires(Permissions.require("codedsmputils.teleportation.homes.edit", true))
+                .requires(Permissions.require("codedsmputils.teleportation.homes.edit", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null))
                         .then(argument("name", StringArgumentType.greedyString()).suggests(this::getHomeSuggestions)
                                 .executes(ctx -> homeDel(ctx, StringArgumentType.getString(ctx, "name")))));
 
         dispatcher.register(literal("homes")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null)
-                .requires(Permissions.require("codedsmputils.teleportation.homes", true))
+                .requires(Permissions.require("codedsmputils.teleportation.homes", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.homes != null))
                 .executes(this::homeList)
                 .then(literal("list")
                         .executes(this::homeList)

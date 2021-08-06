@@ -27,8 +27,8 @@ public class LastDeath {
 
     public LastDeath(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("lastdeath")
-                .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.lastDeath != null)
-                .requires(Permissions.require("codedsmputils.teleportation.last-death", true))
+                .requires(Permissions.require("codedsmputils.teleportation.last-death", true)
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.lastDeath != null))
                 .executes(this::run));
     }
 

@@ -20,8 +20,8 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class PVP {
     public PVP(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("pvp")
-            .requires(source -> CONFIG.pvp != null)
-            .requires(Permissions.require("codedsmputils.pvp", true))
+                .requires(Permissions.require("codedsmputils.pvp", true)
+                        .and(source -> CONFIG.pvp != null))
             .executes(this::togglePvP)
             .then(literal("on")
                     .executes(ctx -> this.setPvP(ctx, true))
