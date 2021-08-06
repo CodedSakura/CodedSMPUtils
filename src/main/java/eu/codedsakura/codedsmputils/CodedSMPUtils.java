@@ -115,7 +115,7 @@ public class CodedSMPUtils implements ModInitializer {
             new PVP(dispatcher);
             new Back(dispatcher);
             new RTP(dispatcher);
-            LastDeath.commands(dispatcher);
+            new LastDeath(dispatcher);
         });
     }
 

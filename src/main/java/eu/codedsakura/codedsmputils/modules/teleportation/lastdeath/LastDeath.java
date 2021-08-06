@@ -25,11 +25,11 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class LastDeath {
     public static HashMap<UUID, DeathPoint> deaths = new HashMap<>();
 
-    public static void commands(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public LastDeath(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("lastdeath")
                 .requires(source -> CONFIG.teleportation != null && CONFIG.teleportation.lastDeath != null)
                 .requires(Permissions.require("codedsmputils.teleportation.last-death", true))
-                .executes(LastDeath::run));
+                .executes(this::run));
     }
 
     private static boolean checkCooldown(ServerPlayerEntity tFrom) {
@@ -44,7 +44,8 @@ public class LastDeath {
         return false;
     }
 
-    public static int run(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+    private int run(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        //noinspection DuplicatedCode
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
         if (TeleportUtils.cantTeleport(player)) return 1;
@@ -57,6 +58,7 @@ public class LastDeath {
         }
         DeathPoint loc = LastDeath.deaths.get(player.getUuid());
 
+        //noinspection DuplicatedCode
         TeleportUtils.genericTeleport(
                 "teleportation.last-death", CONFIG.teleportation.lastDeath.bossBar, CONFIG.teleportation.lastDeath.actionBar, CONFIG.teleportation.lastDeath.standStill,
                 player, () -> {

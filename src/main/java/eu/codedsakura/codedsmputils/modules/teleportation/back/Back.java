@@ -94,6 +94,45 @@ public class Back {
         });
     }
 
+    private int lastDeath(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        //noinspection DuplicatedCode
+        ServerPlayerEntity player = ctx.getSource().getPlayer();
+
+        if (TeleportUtils.cantTeleport(player)) return 1;
+
+        if (checkCooldown(player)) return 1;
+
+        if (!LastDeath.deaths.containsKey(player.getUuid())) {
+            ctx.getSource().sendFeedback(L.get("teleportation.last-death.no-location"), false);
+            return 0;
+        }
+        LastDeath.DeathPoint loc = LastDeath.deaths.get(player.getUuid());
+
+        if (CONFIG.teleportation.lastDeath == null) {
+            TeleportUtils.genericTeleport(
+                    "teleportation.back", CONFIG.teleportation.back.bossBar, CONFIG.teleportation.back.actionBar, CONFIG.teleportation.back.standStill,
+                    player, () -> {
+                        if (CONFIG.teleportation.back.allowBack)
+                            Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
+                                    (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
+                        player.teleport((ServerWorld) loc.world, loc.pos.x, loc.pos.y, loc.pos.z, loc.yaw, loc.pitch);
+                        CooldownManager.addCooldown(LastDeath.class, player.getUuid(), CONFIG.teleportation.back.cooldown);
+                    });
+        } else {
+            //noinspection DuplicatedCode
+            TeleportUtils.genericTeleport(
+                    "teleportation.last-death", CONFIG.teleportation.lastDeath.bossBar, CONFIG.teleportation.lastDeath.actionBar, CONFIG.teleportation.lastDeath.standStill,
+                    player, () -> {
+                        if (CONFIG.teleportation.lastDeath.allowBack)
+                            Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
+                                    (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
+                        player.teleport((ServerWorld) loc.world, loc.pos.x, loc.pos.y, loc.pos.z, loc.yaw, loc.pitch);
+                        CooldownManager.addCooldown(LastDeath.class, player.getUuid(), CONFIG.teleportation.lastDeath.cooldown);
+                    });
+        }
+        return 1;
+    }
+
     private int back(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
@@ -105,12 +144,12 @@ public class Back {
                     .map(loc -> loc.time).max(Long::compareTo);
             if (!maxBack.isPresent()) {
                 if (LastDeath.deaths.containsKey(player.getUuid())) {
-                    return LastDeath.run(ctx);
+                    return lastDeath(ctx);
                 } // else continue
             } else {
                 if (LastDeath.deaths.containsKey(player.getUuid())) {
                     if (maxBack.get() < LastDeath.deaths.get(player.getUuid()).time) {
-                        return LastDeath.run(ctx);
+                        return lastDeath(ctx);
                     } // else continue
                 } // else continue
             }

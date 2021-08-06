@@ -37,7 +37,7 @@ dependencies {
     modImplementation(include("me.lucko:fabric-permissions-api:${project.fpa_version}"))
 
 
-    modImplementation(include("org.openjdk.nashorn:nashorn-core:15.2"))
+    implementation(include("org.openjdk.nashorn:nashorn-core:15.2"))
 }
 
 processResources {
