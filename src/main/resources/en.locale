@@ -46,6 +46,7 @@ teleportation.tpa.cancel.from=[red]You have cancelled the teleport request!
 teleportation.rtp.wait=[light_purple]Please wait while a suitable location is found!
 teleportation.rtp.failed=[red]Failed to find a safe spot!
 teleportation.rtp.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
+teleportation.rtp.disallowed=[red]Use of RTP is not allowed in this dimension!
 
 teleportation.spawn=
 

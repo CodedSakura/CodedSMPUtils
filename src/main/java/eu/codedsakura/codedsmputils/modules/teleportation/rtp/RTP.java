@@ -30,14 +30,14 @@ public class RTP {
     public RTP(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("rtp")
                 .requires(Permissions.require("codedsmputils.teleportation.rtp", true)
-                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.rtp != null)
-                        .and(this::checkIfDimAllowed))
+                        .and(source -> CONFIG.teleportation != null && CONFIG.teleportation.rtp != null))
                 .executes(this::rtpInit));
     }
 
     private boolean checkIfDimAllowed(ServerCommandSource source) {
         try {
             String playerDim = source.getPlayer().getServerWorld().getRegistryKey().getValue().toString();
+            logger.info(playerDim);
             if (CONFIG.teleportation.rtp.blacklistDims != null) {
                 if (Arrays.stream(CONFIG.teleportation.rtp.blacklistDims.split(",")).anyMatch(s -> s.equalsIgnoreCase(playerDim))) {
                     return false;
@@ -68,6 +68,10 @@ public class RTP {
 
         if (TeleportUtils.cantTeleport(player)) return 1;
         if (checkCooldown(player)) return 1;
+        if (!checkIfDimAllowed(ctx.getSource())) {
+            ctx.getSource().sendFeedback(L.get("teleportation.rtp.disallowed"), false);
+            return 1;
+        }
         CooldownManager.addCooldown(RTP.class, player.getUuid(), CONFIG.teleportation.rtp.cooldown);
 
         Thread wait = new Thread(() -> {
@@ -96,7 +100,7 @@ public class RTP {
                     airHistory[0] = blockState.isAir();
 
                     if (!airHistory[0] && airHistory[1] && airHistory[2]) {
-                        if (checkAndTP(player, blockPos, blockState)) {
+                        if (checkAndTP(player, blockPos, blockState, world)) {
                             wait.interrupt();
                             logger.info("[CSMPU] RTP took {} attempt(s), {} millisecond(s)",
                                     attempts, System.currentTimeMillis() - timeStart);
@@ -156,7 +160,7 @@ public class RTP {
 
     }
 
-    private boolean checkAndTP(ServerPlayerEntity player, BlockPos blockPos, BlockState blockState) {
+    private boolean checkAndTP(ServerPlayerEntity player, BlockPos blockPos, BlockState blockState, ServerWorld world) {
         Material material = blockState.getMaterial();
         if (!material.isLiquid() && material != Material.FIRE) {
             TeleportUtils.genericTeleport(
@@ -166,7 +170,7 @@ public class RTP {
                         if (CONFIG.teleportation.rtp.allowBack)
                             Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
                                     (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
-                        player.teleport(blockPos.getX() + .5, blockPos.getY() + 1, blockPos.getZ() + .5);
+                        player.teleport(world, blockPos.getX() + .5, blockPos.getY() + 1, blockPos.getZ() + .5, player.getYaw(), player.getPitch());
                     });
             return true;
         }
