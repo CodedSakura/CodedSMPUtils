@@ -18,21 +18,11 @@
   "entrypoints": {
     "main": [
       "eu.codedsakura.codedsmputils.CodedSMPUtils"
-    ],
-    "cardinal-components": [
-      "eu.codedsakura.codedsmputils.SMPUtilCardinalComponents"
     ]
   },
   "mixins": [
     "CodedSMPUtils.mixins.json"
   ],
-  "custom": {
-    "cardinal-components": [
-      "fabric-smp-utils:homes",
-      "fabric-smp-utils:pvp",
-      "fabric-smp-utils:warps"
-    ]
-  },
   "depends": {
     "fabricloader": ">=0.10.6+build.214",
     "fabric": "*",

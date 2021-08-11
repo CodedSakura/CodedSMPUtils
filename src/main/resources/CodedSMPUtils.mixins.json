@@ -6,6 +6,7 @@
   "plugin": "eu.codedsakura.codedsmputils.mixin.MixinConfigPlugin",
   "mixins": [
     "DeathMixin",
+    "PlayerNBTMixin",
     "PVPMixin",
     "TPMixin",
     "nomobgrief.CreeperExplosionMixin",

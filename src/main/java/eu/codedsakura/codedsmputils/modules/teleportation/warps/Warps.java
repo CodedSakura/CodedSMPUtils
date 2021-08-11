@@ -37,7 +37,6 @@ import java.util.stream.StreamSupport;
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.CONFIG;
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.L;
-import static eu.codedsakura.codedsmputils.SMPUtilCardinalComponents.WARP_LIST;
 import static net.minecraft.command.argument.RotationArgumentType.getRotation;
 import static net.minecraft.command.argument.Vec3ArgumentType.getPosArgument;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -47,7 +46,7 @@ public class Warps {
     private List<Pair<ServerWorld, Warp>> getAllWarps(MinecraftServer server) {
         List<Pair<ServerWorld, Warp>> out = new ArrayList<>();
         server.getWorlds().forEach(serverWorld ->
-                WARP_LIST.get(serverWorld).getWarps().forEach(warp ->
+                WarpListComponent.get(serverWorld).getWarps().forEach(warp ->
                         out.add(new Pair<>(serverWorld, warp))));
         out.sort((o1, o2) -> o1.getLeft().toString().compareToIgnoreCase(o2.getLeft().toString()));
         return out;
@@ -96,7 +95,7 @@ public class Warps {
                 .filter(v -> v.getRight().name.equals(name)).findFirst()
                 .orElseThrow(() -> new SimpleCommandExceptionType(L.get("teleportation.warps.invalid-name")).create());
 
-        if (!WARP_LIST.get(warp.getLeft()).removeWarp(warp.getRight().name))
+        if (!WarpListComponent.get(warp.getLeft()).removeWarp(warp.getRight().name))
             throw new SimpleCommandExceptionType(L.get("teleportation.warps.remove.failed")).create();
 
         ctx.getSource().sendFeedback(L.get("teleportation.warps.remove.success",
@@ -127,7 +126,7 @@ public class Warps {
 
         Warp newWarp = new Warp(position, rotation, name, ctx.getSource().getPlayer().getUuid());
 
-        if (!WARP_LIST.get(dimension).addWarp(newWarp))
+        if (!WarpListComponent.get(dimension).addWarp(newWarp))
             throw new SimpleCommandExceptionType(L.get("teleportation.warps.add.failed", arguments)).create();
 
         ctx.getSource().sendFeedback(L.get("teleportation.warps.add.success", arguments), true);
@@ -135,9 +134,11 @@ public class Warps {
     }
 
     private MutableText warpListForDimension(ServerWorld dimension) {
-        List<Warp> warps = WARP_LIST.get(dimension).getWarps();
+        List<Warp> warps = WarpListComponent.get(dimension).getWarps();
         MutableText list = L.get("teleportation.warps.list.header",
-                new HashMap<String, Object>() {{ put("dimension", dimension.getRegistryKey().getValue().toString()); }}).shallowCopy();
+                new HashMap<String, Object>() {{
+                    put("dimension", dimension.getRegistryKey().getValue().toString());
+                }}).shallowCopy();
 
         warps.stream().sorted((o1, o2) -> o1.name.compareToIgnoreCase(o2.name)).forEach((v) ->
                 list.append(L.get("teleportation.warps.list.entry", v.asArguments(dimension))));

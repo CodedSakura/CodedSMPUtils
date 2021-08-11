@@ -56,6 +56,8 @@ public class CodedSMPUtils implements ModInitializer {
         if (CONFIG == null) loadConfig();
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+//            server.getWorlds().forEach(world -> world.getPersistentStateManager().);
+
             try {
                 if (CONFIG.teleportation != null) {
                     if (CONFIG.teleportation.back != null)

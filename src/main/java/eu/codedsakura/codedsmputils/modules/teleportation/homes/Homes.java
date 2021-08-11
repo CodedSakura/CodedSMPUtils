@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.*;
-import static eu.codedsakura.codedsmputils.SMPUtilCardinalComponents.HOME_DATA;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -87,7 +86,7 @@ public class Homes {
 
     private CompletableFuture<Suggestions> getHomeSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         String start = builder.getRemaining().toLowerCase();
-        HOME_DATA.get(context.getSource().getPlayer()).getHomes().stream()
+        HomeDataComponent.get(context.getSource().getPlayer()).getHomes().stream()
                 .map(HomeComponent::getName)
                 .sorted(String::compareToIgnoreCase)
                 .filter(v -> v.toLowerCase().startsWith(start))
@@ -103,7 +102,7 @@ public class Homes {
         if (name == null) name = "main";
 
         String finalName = name;
-        Optional<HomeComponent> home = HOME_DATA.get(player).getHomes()
+        Optional<HomeComponent> home = HomeDataComponent.get(player).getHomes()
                 .stream().filter(v -> v.getName().equals(finalName)).findFirst();
 
         if (!home.isPresent()) {
@@ -115,7 +114,7 @@ public class Homes {
 
         boolean allowBack;
         allowBack = CONFIG.teleportation.homes.allowBack.getValue(new HashMap<String, Object>() {{
-            put("home_count", HOME_DATA.get(player).getHomes().size());
+            put("home_count", HomeDataComponent.get(player).getHomes().size());
             put("max", CONFIG.teleportation.homes.starting);
         }});
 
@@ -137,12 +136,12 @@ public class Homes {
     int homeSet(CommandContext<ServerCommandSource> ctx, String name) throws CommandSyntaxException {
         if (name == null) name = "main";
 
-        if (HOME_DATA.get(ctx.getSource().getPlayer()).getHomes().size() >= CONFIG.teleportation.homes.starting) {
+        if (HomeDataComponent.get(ctx.getSource().getPlayer()).getHomes().size() >= CONFIG.teleportation.homes.starting) {
             ctx.getSource().sendFeedback(L.get("teleportation.homes.limit"), false);
             return 1;
         }
 
-        if (HOME_DATA.get(ctx.getSource().getPlayer()).addHome(new HomeComponent(
+        if (HomeDataComponent.get(ctx.getSource().getPlayer()).addHome(new HomeComponent(
                 ctx.getSource().getPosition(),
                 ctx.getSource().getPlayer().getPitch(),
                 ctx.getSource().getPlayer().getYaw(),
@@ -150,7 +149,7 @@ public class Homes {
                 name))) {
 
             String finalName = name;
-            Optional<HomeComponent> home = HOME_DATA.get(ctx.getSource().getPlayer()).getHomes()
+            Optional<HomeComponent> home = HomeDataComponent.get(ctx.getSource().getPlayer()).getHomes()
                     .stream().filter(v -> v.getName().equals(finalName)).findFirst();
 
             if (!home.isPresent()) {
@@ -168,8 +167,8 @@ public class Homes {
     }
 
     int homeDel(CommandContext<ServerCommandSource> ctx, String name) throws CommandSyntaxException {
-        if (HOME_DATA.get(ctx.getSource().getPlayer()).removeHome(name)) {
-            Optional<HomeComponent> home = HOME_DATA.get(ctx.getSource().getPlayer()).getHomes()
+        if (HomeDataComponent.get(ctx.getSource().getPlayer()).removeHome(name)) {
+            Optional<HomeComponent> home = HomeDataComponent.get(ctx.getSource().getPlayer()).getHomes()
                     .stream().filter(v -> v.getName().equals(name)).findFirst();
 
             if (home.isPresent()) {
@@ -178,7 +177,9 @@ public class Homes {
             }
 
             ctx.getSource().sendFeedback(L.get("teleportation.homes.remove.success",
-                    new HashMap<String, Object>() {{ put("name", name); }}), false);
+                    new HashMap<String, Object>() {{
+                        put("name", name);
+                    }}), false);
         } else {
             ctx.getSource().sendFeedback(L.get("teleportation.homes.remove.could-not"), false);
             return 1;
@@ -191,12 +192,12 @@ public class Homes {
         return homeList(ctx, ctx.getSource().getPlayer());
     }
     int homeList(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity player) {
-        List<HomeComponent> homes = HOME_DATA.get(player).getHomes();
+        List<HomeComponent> homes = HomeDataComponent.get(player).getHomes();
         MutableText list = L.get("teleportation.homes.list.header",
                 new HashMap<String, Object>() {{
                     put("home_count", homes.size());
                     put("max", CONFIG.teleportation.homes.starting);
-        }}).shallowCopy();
+                }}).shallowCopy();
         homes.stream().sorted((h1, h2) -> h1.getName().compareToIgnoreCase(h2.getName())).forEach(h ->
                 list.append(L.get("teleportation.homes.list.entry", h.asArguments())));
         ctx.getSource().sendFeedback(list, false);

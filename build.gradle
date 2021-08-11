@@ -29,8 +29,8 @@ dependencies {
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
-    modApi(include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cca_version}"))
-    modImplementation(include("io.github.onyxstudios:Cardinal-Components-API:${project.cca_version}"))
+//    modApi(include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cca_version}"))
+//    modImplementation(include("io.github.onyxstudios:Cardinal-Components-API:${project.cca_version}"))
 
     modImplementation(include("eu.pb4:placeholder-api:${project.placeholder_api_version}"))
 

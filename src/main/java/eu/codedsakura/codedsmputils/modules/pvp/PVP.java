@@ -13,7 +13,6 @@ import java.util.Collections;
 
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.CONFIG;
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.L;
-import static eu.codedsakura.codedsmputils.SMPUtilCardinalComponents.PVP_DATA;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -39,7 +38,7 @@ public class PVP {
         return setPvP(ctx, b, Collections.singletonList(ctx.getSource().getPlayer()));
     }
     private int setPvP(CommandContext<ServerCommandSource> ctx, boolean b, Collection<ServerPlayerEntity> players) {
-        players.forEach(v -> PVP_DATA.get(v).set(b));
+        players.forEach(v -> PvPComponent.get(v).set(b));
 
         ctx.getSource().sendFeedback(
                 L.get(String.format("pvp.change.%s.%s", players.size() == 1 ? "one" : "all", b ? "on" : "off")),
@@ -49,7 +48,7 @@ public class PVP {
     }
 
     private int togglePvP(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
-        IPvPComponent pvpComponent = PVP_DATA.get(ctx.getSource().getPlayer());
+        PvPComponent pvpComponent = PvPComponent.get(ctx.getSource().getPlayer());
         pvpComponent.set(!pvpComponent.isOn());
 
         ctx.getSource().sendFeedback(
