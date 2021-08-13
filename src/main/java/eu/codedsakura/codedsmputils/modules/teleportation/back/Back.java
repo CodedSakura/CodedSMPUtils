@@ -14,6 +14,7 @@ import eu.codedsakura.codedsmputils.requirements.fulfillables.StaticItem;
 import eu.codedsakura.codedsmputils.requirements.fulfillables.StaticXP;
 import eu.codedsakura.common.TeleportUtils;
 import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -36,42 +37,6 @@ public class Back {
     private final ArrayList<FulfillmentRequest> fulfillmentRequests = new ArrayList<>();
 
 
-    public static class TeleportLocation {
-        UUID player;
-        long time;
-        ServerWorld world;
-        double x, y, z;
-        float yaw, pitch;
-
-        public TeleportLocation(UUID player, long time, ServerWorld world, double x, double y, double z, float yaw, float pitch) {
-            this.player = player;
-            this.time = time;
-            this.world = world;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.yaw = yaw;
-            this.pitch = pitch;
-        }
-
-        protected Map<String, ?> toArguments(MinecraftServer server) {
-            return new HashMap<String, Object>() {{
-                put("player", Objects.requireNonNull(server.getPlayerManager().getPlayer(player)).getName());
-                put("uuid", player.toString());
-                put("time_of_request", time);
-                put("seconds_since_teleport", Instant.now().getEpochSecond() - time);
-                put("dimension", world.getRegistryKey().getValue().toString());
-            }};
-        }
-    }
-
-    public static void addNewTeleport(TeleportLocation location) {
-        if (CONFIG.teleportation == null || CONFIG.teleportation.back == null || !CONFIG.teleportation.allowBack) return;
-        teleports.removeIf(location1 -> location1.player.compareTo(location.player) == 0);
-        teleports.add(location);
-    }
-
-
     public Back(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("back")
                 .requires(Permissions.require("codedsmputils.teleportation.back", true)
@@ -84,14 +49,15 @@ public class Back {
                                         .executes(this::fulfill)))));
     }
 
-    private boolean needsToFulfill(ServerCommandSource source) {
-        return fulfillmentRequests.stream().anyMatch(fr -> {
-            try {
-                return source.getPlayer().getUuid().compareTo(fr.uuid) == 0;
-            } catch (CommandSyntaxException ignored) {
-                return false;
-            }
-        });
+    public static void addNewTeleport(PlayerEntity player) {
+        addNewTeleport(new TeleportLocation(player));
+    }
+
+    public static void addNewTeleport(TeleportLocation location) {
+        if (CONFIG.teleportation == null || CONFIG.teleportation.back == null || !CONFIG.teleportation.allowBack)
+            return;
+        teleports.removeIf(location1 -> location1.player.compareTo(location.player) == 0);
+        teleports.add(location);
     }
 
     private int lastDeath(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
@@ -100,7 +66,7 @@ public class Back {
 
         if (TeleportUtils.cantTeleport(player)) return 1;
 
-        if (checkCooldown(player)) return 1;
+        if (CooldownManager.check(player, LastDeath.class, "back")) return 1;
 
         if (!LastDeath.deaths.containsKey(player.getUuid())) {
             ctx.getSource().sendFeedback(L.get("teleportation.last-death.no-location"), false);
@@ -112,9 +78,7 @@ public class Back {
             TeleportUtils.genericTeleport(
                     "teleportation.back", CONFIG.teleportation.back.bossBar, CONFIG.teleportation.back.actionBar, CONFIG.teleportation.back.standStill,
                     player, () -> {
-                        if (CONFIG.teleportation.back.allowBack)
-                            Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
-                                    (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
+                        if (CONFIG.teleportation.back.allowBack) Back.addNewTeleport(player);
                         player.teleport((ServerWorld) loc.world, loc.pos.x, loc.pos.y, loc.pos.z, loc.yaw, loc.pitch);
                         CooldownManager.addCooldown(LastDeath.class, player.getUuid(), CONFIG.teleportation.back.cooldown);
                     });
@@ -123,14 +87,22 @@ public class Back {
             TeleportUtils.genericTeleport(
                     "teleportation.last-death", CONFIG.teleportation.lastDeath.bossBar, CONFIG.teleportation.lastDeath.actionBar, CONFIG.teleportation.lastDeath.standStill,
                     player, () -> {
-                        if (CONFIG.teleportation.lastDeath.allowBack)
-                            Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
-                                    (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
+                        if (CONFIG.teleportation.lastDeath.allowBack) Back.addNewTeleport(player);
                         player.teleport((ServerWorld) loc.world, loc.pos.x, loc.pos.y, loc.pos.z, loc.yaw, loc.pitch);
                         CooldownManager.addCooldown(LastDeath.class, player.getUuid(), CONFIG.teleportation.lastDeath.cooldown);
                     });
         }
         return 1;
+    }
+
+    private boolean needsToFulfill(ServerCommandSource source) {
+        return fulfillmentRequests.stream().anyMatch(fr -> {
+            try {
+                return source.getPlayer().getUuid().compareTo(fr.uuid) == 0;
+            } catch (CommandSyntaxException ignored) {
+                return false;
+            }
+        });
     }
 
     private int back(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
@@ -166,7 +138,7 @@ public class Back {
             return 0;
         }
 
-        if (checkCooldown(player)) return 1;
+        if (CooldownManager.check(player, Back.class, "back")) return 1;
 
         TeleportLocation loc = locations.get(0);
         boolean cost;
@@ -220,14 +192,15 @@ public class Back {
         return 1;
     }
 
-    private boolean checkCooldown(ServerPlayerEntity tFrom) {
-        long remaining = CooldownManager.getCooldownTimeRemaining(Back.class, tFrom.getUuid());
-        if (remaining > 0) {
-            tFrom.sendMessage(L.get("teleportation.back.cooldown",
-                    new HashMap<String, Long>() {{ put("remaining", remaining); }}), false);
-            return true;
-        }
-        return false;
+    private void teleport(ServerPlayerEntity player, TeleportLocation loc) {
+        teleports.removeIf(location -> location.player.compareTo(player.getUuid()) == 0);
+        TeleportUtils.genericTeleport(
+                "teleportation.back", CONFIG.teleportation.back.bossBar, CONFIG.teleportation.back.actionBar, CONFIG.teleportation.back.standStill,
+                player, () -> {
+                    if (CONFIG.teleportation.back.allowBack) Back.addNewTeleport(player);
+                    player.teleport(loc.world, loc.x, loc.y, loc.z, loc.yaw, loc.pitch);
+                    CooldownManager.addCooldown(Back.class, player.getUuid(), CONFIG.teleportation.back.cooldown);
+                });
     }
 
     private int fulfill(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
@@ -260,17 +233,38 @@ public class Back {
         return 1;
     }
 
-    private void teleport(ServerPlayerEntity player, TeleportLocation loc) {
-        teleports.removeIf(location -> location.player.compareTo(player.getUuid()) == 0);
-        TeleportUtils.genericTeleport(
-                "teleportation.back", CONFIG.teleportation.back.bossBar, CONFIG.teleportation.back.actionBar, CONFIG.teleportation.back.standStill,
-                player, () -> {
-                    if (CONFIG.teleportation.back.allowBack)
-                        Back.addNewTeleport(new TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
-                                (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
-                    player.teleport(loc.world, loc.x, loc.y, loc.z, loc.yaw, loc.pitch);
-                    CooldownManager.addCooldown(Back.class, player.getUuid(), CONFIG.teleportation.back.cooldown);
-                });
+    public static class TeleportLocation {
+        UUID player;
+        long time;
+        ServerWorld world;
+        double x, y, z;
+        float yaw, pitch;
+
+        public TeleportLocation(UUID player, long time, ServerWorld world, double x, double y, double z, float yaw, float pitch) {
+            this.player = player;
+            this.time = time;
+            this.world = world;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.yaw = yaw;
+            this.pitch = pitch;
+        }
+
+        public TeleportLocation(PlayerEntity player) {
+            this(player.getUuid(), Instant.now().getEpochSecond(), (ServerWorld) player.world,
+                    player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
+        }
+
+        protected Map<String, ?> toArguments(MinecraftServer server) {
+            return new HashMap<String, Object>() {{
+                put("player", Objects.requireNonNull(server.getPlayerManager().getPlayer(player)).getName());
+                put("uuid", player.toString());
+                put("time_of_request", time);
+                put("seconds_since_teleport", Instant.now().getEpochSecond() - time);
+                put("dimension", world.getRegistryKey().getValue().toString());
+            }};
+        }
     }
 
     private static class FulfillmentRequest {

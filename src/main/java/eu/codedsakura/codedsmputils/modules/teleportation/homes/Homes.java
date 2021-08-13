@@ -19,7 +19,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -74,16 +73,6 @@ public class Homes {
         // TODO
     }
 
-    private boolean checkCooldown(ServerPlayerEntity tFrom) {
-        long remaining = CooldownManager.getCooldownTimeRemaining(Homes.class, tFrom.getUuid());
-        if (remaining > 0) {
-            tFrom.sendMessage(L.get("teleportation.homes.cooldown",
-                    new HashMap<String, Long>() {{ put("remaining", remaining); }}), false);
-            return true;
-        }
-        return false;
-    }
-
     private CompletableFuture<Suggestions> getHomeSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         String start = builder.getRemaining().toLowerCase();
         HomeDataComponent.get(context.getSource().getPlayer()).getHomes().stream()
@@ -110,7 +99,7 @@ public class Homes {
             return 0;
         }
 
-        if (checkCooldown(player)) return 1;
+        if (CooldownManager.check(player, Homes.class, "homes")) return 1;
 
         boolean allowBack;
         allowBack = CONFIG.teleportation.homes.allowBack.getValue(new HashMap<String, Object>() {{
@@ -121,9 +110,7 @@ public class Homes {
         TeleportUtils.genericTeleport(
                 "teleportation.homes", CONFIG.teleportation.homes.bossBar, CONFIG.teleportation.homes.actionBar, CONFIG.teleportation.homes.standStill,
                 player, () -> {
-                    if (allowBack)
-                        Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
-                                (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
+                    if (allowBack) Back.addNewTeleport(player);
 
                     ServerWorld world = ctx.getSource().getServer().getWorld(RegistryKey.of(Registry.WORLD_KEY, home.get().getDimID()));
                     player.teleport(world, home.get().getX(), home.get().getY(), home.get().geyZ(), home.get().getYaw(), home.get().getPitch());

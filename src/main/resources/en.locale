@@ -42,14 +42,13 @@ teleportation.tpa.deny.from=[red][aqua]{$req_to_name}[/aqua] has cancelled the t
 teleportation.tpa.cancel.multiple-ongoing=[red]You currently have multiple active teleport requests! Please specify whose request to cancel.
 teleportation.tpa.cancel.to=[red][aqua]{$req_from_name}[/aqua] has cancelled the teleport request!
 teleportation.tpa.cancel.from=[red]You have cancelled the teleport request!
-
 teleportation.rtp.wait=[light_purple]Please wait while a suitable location is found!
 teleportation.rtp.failed=[red]Failed to find a safe spot!
 teleportation.rtp.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
 teleportation.rtp.disallowed=[red]Use of RTP is not allowed in this dimension!
-
-teleportation.spawn=
-
+teleportation.spawn.no-world=[red]Failed to find the world, please inform an admin!
+teleportation.spawn.not-found=[red]Failed to find a spawn location!
+teleportation.spawn.cooldown=[red]You cannot make a request for [gold]{$remaining}[/gold] more seconds!
 teleportation.warps.invalid-name=[red]Invalid warp name!
 teleportation.warps.add.already-exists=[red]Warp [gold]"{$name}"[/gold] already exists!
 teleportation.warps.add.failed=[red]Failed to add warp!

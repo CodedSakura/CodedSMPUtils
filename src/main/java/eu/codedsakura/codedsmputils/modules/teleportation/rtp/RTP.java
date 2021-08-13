@@ -5,10 +5,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
 import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
+import eu.codedsakura.common.BlockUtils;
 import eu.codedsakura.common.TeleportUtils;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -16,9 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
-import java.time.Instant;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
 
 import static eu.codedsakura.codedsmputils.CodedSMPUtils.*;
@@ -52,22 +50,12 @@ public class RTP {
         }
     }
 
-    private boolean checkCooldown(ServerPlayerEntity tFrom) {
-        long remaining = CooldownManager.getCooldownTimeRemaining(RTP.class, tFrom.getUuid());
-        if (remaining > 0) {
-            tFrom.sendMessage(L.get("teleportation.rtp.cooldown",
-                    new HashMap<String, Long>() {{ put("remaining", remaining); }}), false);
-            return true;
-        }
-        return false;
-    }
-
     private int rtpInit(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         Random r = new Random();
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
         if (TeleportUtils.cantTeleport(player)) return 1;
-        if (checkCooldown(player)) return 1;
+        if (CooldownManager.check(player, RTP.class, "rtp")) return 1;
         if (!checkIfDimAllowed(ctx.getSource())) {
             ctx.getSource().sendFeedback(L.get("teleportation.rtp.disallowed"), false);
             return 1;
@@ -161,15 +149,12 @@ public class RTP {
     }
 
     private boolean checkAndTP(ServerPlayerEntity player, BlockPos blockPos, BlockState blockState, ServerWorld world) {
-        Material material = blockState.getMaterial();
-        if (!material.isLiquid() && material != Material.FIRE) {
+        if (BlockUtils.isSafe(blockState)) {
             TeleportUtils.genericTeleport(
                     "teleportation.rtp",
                     CONFIG.teleportation.rtp.bossBar, CONFIG.teleportation.rtp.actionBar, CONFIG.teleportation.rtp.standStill,
                     player, () -> {
-                        if (CONFIG.teleportation.rtp.allowBack)
-                            Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
-                                    (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
+                        if (CONFIG.teleportation.rtp.allowBack) Back.addNewTeleport(player);
                         player.teleport(world, blockPos.getX() + .5, blockPos.getY() + 1, blockPos.getZ() + .5, player.getYaw(), player.getPitch());
                     });
             return true;

@@ -12,7 +12,6 @@ import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
@@ -20,7 +19,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -100,16 +98,6 @@ public class TPA {
         return filterSuggestionsByInput(builder, activeTargets);
     }
 
-    private boolean checkCooldown(ServerPlayerEntity tFrom) {
-        long remaining = CooldownManager.getCooldownTimeRemaining(TPA.class, tFrom.getUuid());
-        if (remaining > 0) {
-            tFrom.sendMessage(L.get("teleportation.tpa.cooldown",
-                    new HashMap<String, Long>() {{ put("remaining", remaining); }}), false);
-            return true;
-        }
-        return false;
-    }
-
     public int tpaInit(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity tTo) throws CommandSyntaxException {
         final ServerPlayerEntity tFrom = ctx.getSource().getPlayer();
 
@@ -118,7 +106,7 @@ public class TPA {
             return 1;
         }
 
-        if (checkCooldown(tFrom)) return 1;
+        if (CooldownManager.check(tFrom, TPA.class, "tpa")) return 1;
 
         TPARequest tr = new TPARequest(tFrom, tTo, false, CONFIG.teleportation.tpa.timeout * 1000);
         if (activeTPA.stream().anyMatch(tpaRequest -> tpaRequest.equals(tr))) {
@@ -147,7 +135,7 @@ public class TPA {
             return 1;
         }
 
-        if (checkCooldown(tFrom)) return 1;
+        if (CooldownManager.check(tFrom, TPA.class, "tpa")) return 1;
 
         TPARequest tr = new TPARequest(tFrom, tTo, true, CONFIG.teleportation.tpa.timeout * 1000);
         if (activeTPA.stream().anyMatch(tpaRequest -> tpaRequest.equals(tr))) {
@@ -219,9 +207,7 @@ public class TPA {
                 "teleportation.tpa", CONFIG.teleportation.tpa.bossBar, CONFIG.teleportation.tpa.actionBar, CONFIG.teleportation.tpa.standStill,
                 rFrom, () -> {
                     if (tr.tFrom.isRemoved() || tr.tTo.isRemoved()) tr.refreshPlayers();
-                    if (CONFIG.teleportation.tpa.allowBack)
-                        Back.addNewTeleport(new Back.TeleportLocation(tr.tFrom.getUuid(), Instant.now().getEpochSecond(),
-                                (ServerWorld) tr.tFrom.world, tr.tFrom.getX(), tr.tFrom.getY(), tr.tFrom.getZ(), tr.tFrom.getYaw(), tr.tFrom.getPitch()));
+                    if (CONFIG.teleportation.tpa.allowBack) Back.addNewTeleport(tr.tFrom);
                     tr.tFrom.teleport(tr.tTo.getServerWorld(), tr.tTo.getX(), tr.tTo.getY(), tr.tTo.getZ(), tr.tTo.getYaw(), tr.tTo.getPitch());
                     switch (CONFIG.teleportation.tpa.cooldownMode) {
                         case BothUsers:

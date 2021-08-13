@@ -12,6 +12,7 @@ import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
 import eu.codedsakura.codedsmputils.modules.teleportation.homes.Homes;
 import eu.codedsakura.codedsmputils.modules.teleportation.lastdeath.LastDeath;
 import eu.codedsakura.codedsmputils.modules.teleportation.rtp.RTP;
+import eu.codedsakura.codedsmputils.modules.teleportation.spawn.Spawn;
 import eu.codedsakura.codedsmputils.modules.teleportation.tpa.TPA;
 import eu.codedsakura.codedsmputils.modules.teleportation.warps.Warps;
 import eu.codedsakura.codedsmputils.requirements.RequirementManager;
@@ -82,7 +83,7 @@ public class CodedSMPUtils implements ModInitializer {
 //                .build();
 
 
-        // TODO /spawn, /bottle, /afk
+        // TODO /bottle, /afk
         // CONSIDER /trade, pet transfer to other player /disown?
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
@@ -118,6 +119,7 @@ public class CodedSMPUtils implements ModInitializer {
             new Back(dispatcher);
             new RTP(dispatcher);
             new LastDeath(dispatcher);
+            new Spawn(dispatcher);
         });
     }
 

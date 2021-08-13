@@ -14,7 +14,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -32,25 +31,13 @@ public class LastDeath {
                 .executes(this::run));
     }
 
-    private static boolean checkCooldown(ServerPlayerEntity tFrom) {
-        long remaining = CooldownManager.getCooldownTimeRemaining(LastDeath.class, tFrom.getUuid());
-        if (remaining > 0) {
-            tFrom.sendMessage(L.get("teleportation.last-death.cooldown",
-                    new HashMap<String, Long>() {{
-                        put("remaining", remaining);
-                    }}), false);
-            return true;
-        }
-        return false;
-    }
-
     private int run(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         //noinspection DuplicatedCode
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
         if (TeleportUtils.cantTeleport(player)) return 1;
 
-        if (checkCooldown(player)) return 1;
+        if (CooldownManager.check(player, LastDeath.class, "last-death")) return 1;
 
         if (!LastDeath.deaths.containsKey(player.getUuid())) {
             ctx.getSource().sendFeedback(L.get("teleportation.last-death.no-location"), false);
@@ -62,9 +49,7 @@ public class LastDeath {
         TeleportUtils.genericTeleport(
                 "teleportation.last-death", CONFIG.teleportation.lastDeath.bossBar, CONFIG.teleportation.lastDeath.actionBar, CONFIG.teleportation.lastDeath.standStill,
                 player, () -> {
-                    if (CONFIG.teleportation.lastDeath.allowBack)
-                        Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
-                                (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
+                    if (CONFIG.teleportation.lastDeath.allowBack) Back.addNewTeleport(player);
                     player.teleport((ServerWorld) loc.world, loc.pos.x, loc.pos.y, loc.pos.z, loc.yaw, loc.pitch);
                     CooldownManager.addCooldown(LastDeath.class, player.getUuid(), CONFIG.teleportation.lastDeath.cooldown);
                 });

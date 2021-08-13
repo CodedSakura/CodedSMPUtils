@@ -26,7 +26,6 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -157,20 +156,10 @@ public class Warps {
         return 1;
     }
 
-    private boolean checkCooldown(ServerPlayerEntity tFrom) {
-        long remaining = CooldownManager.getCooldownTimeRemaining(Warps.class, tFrom.getUuid());
-        if (remaining > 0) {
-            tFrom.sendMessage(L.get("teleportation.warps.cooldown",
-                    new HashMap<String, Long>() {{ put("remaining", remaining); }}), false);
-            return true;
-        }
-        return false;
-    }
-
     private int warpTo(CommandContext<ServerCommandSource> ctx, String name) throws CommandSyntaxException {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
         if (TeleportUtils.cantTeleport(player)) return 1;
-        if (checkCooldown(player)) return 1;
+        if (CooldownManager.check(player, Warps.class, "warps")) return 1;
         return warpTo(ctx, player, name);
     }
 
@@ -182,9 +171,7 @@ public class Warps {
         TeleportUtils.genericTeleport(
                 "teleportation.warps", CONFIG.teleportation.warps.bossBar, CONFIG.teleportation.warps.actionBar, CONFIG.teleportation.warps.standStill,
                 player, () -> {
-                    if (CONFIG.teleportation.warps.allowBack)
-                        Back.addNewTeleport(new Back.TeleportLocation(player.getUuid(), Instant.now().getEpochSecond(),
-                                (ServerWorld) player.world, player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch()));
+                    if (CONFIG.teleportation.warps.allowBack) Back.addNewTeleport(player);
                     player.teleport(warp.getLeft(), warp.getRight().x, warp.getRight().y, warp.getRight().z, warp.getRight().yaw, warp.getRight().pitch);
                     CooldownManager.addCooldown(Warps.class, player.getUuid(), CONFIG.teleportation.warps.cooldown);
                 });
