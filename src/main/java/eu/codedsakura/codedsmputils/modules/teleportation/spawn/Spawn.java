@@ -78,7 +78,6 @@ public class Spawn {
                     newPos.setY(y + verticalOffset);
                     BlockState stateUp = world.getBlockState(newPos);
                     upHistory = ((upHistory << 1) & 0b111) | (stateUp.isAir() ? 1 : 0);
-                    logger.info("csmpu/spawn/up   {}; offset {}; {}", upHistory, verticalOffset, stateUp);
                     if (upHistory == 0b011) {
                         if (BlockUtils.isSafe(newPos.setY(y + verticalOffset - 2), world)) {
                             return newPos.setY(y + verticalOffset - 1).toImmutable();
@@ -92,7 +91,6 @@ public class Spawn {
                     newPos.setY(y - verticalOffset);
                     BlockState stateDown = world.getBlockState(newPos);
                     downHistory = ((downHistory << 1) & 0b111) | (stateDown.isAir() ? 1 : 0);
-                    logger.info("csmpu/spawn/down {}; offset {}; {}", downHistory, verticalOffset, stateDown);
                     if (downHistory == 0b110 && BlockUtils.isSafe(stateDown)) {
                         return newPos.setY(y - verticalOffset + 1).toImmutable();
                     }
