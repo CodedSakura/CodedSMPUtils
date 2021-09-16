@@ -65,12 +65,13 @@ class TPARequest {
                 '}';
     }
 
-    public void refreshPlayers() {
+    public boolean refreshPlayers() {
+        if (tFrom == null || tTo == null) return false;
         this.tFrom = tFrom.server.getPlayerManager().getPlayer(tFrom.getUuid());
         this.tTo = tTo.server.getPlayerManager().getPlayer(tTo.getUuid());
         this.rFrom = this.tpaHere ? tTo : tFrom;
         this.rTo = this.tpaHere ? tFrom : tTo;
-        assert tFrom != null && tTo != null;
+        return tFrom != null && tTo != null;
     }
 
     public Map<String, ?> asArguments() {

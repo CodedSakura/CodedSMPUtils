@@ -137,7 +137,8 @@ public class TPA {
 
         if (CooldownManager.check(tFrom, TPA.class, "tpa")) return 1;
 
-        TPARequest tr = new TPARequest(tFrom, tTo, true, CONFIG.teleportation.tpa.timeout * 1000);
+        TPARequest tr = new TPARequest(tFrom, tTo, true,
+                CONFIG.teleportation.tpa.timeout * 1000);
         if (activeTPA.stream().anyMatch(tpaRequest -> tpaRequest.equals(tr))) {
             tFrom.sendMessage(L.get("teleportation.tpa.already-exists"), false);
             return 1;
@@ -206,7 +207,13 @@ public class TPA {
         TeleportUtils.genericTeleport(
                 "teleportation.tpa", CONFIG.teleportation.tpa.bossBar, CONFIG.teleportation.tpa.actionBar, CONFIG.teleportation.tpa.standStill,
                 rFrom, () -> {
-                    if (tr.tFrom.isRemoved() || tr.tTo.isRemoved()) tr.refreshPlayers();
+                    if (tr.tFrom.isRemoved() || tr.tTo.isRemoved()) {
+                        if (!tr.refreshPlayers()) {
+                            if (tr.tFrom != null) tr.tFrom.sendMessage(L.get("teleporting.tpa.no-player.tp-to"), false);
+                            if (tr.tTo != null) tr.tTo.sendMessage(L.get("teleporting.tpa.no-player.tp-from"), false);
+                            return;
+                        }
+                    }
                     if (CONFIG.teleportation.tpa.allowBack) Back.addNewTeleport(tr.tFrom);
                     tr.tFrom.teleport(tr.tTo.getServerWorld(), tr.tTo.getX(), tr.tTo.getY(), tr.tTo.getZ(), tr.tTo.getYaw(), tr.tTo.getPitch());
                     switch (CONFIG.teleportation.tpa.cooldownMode) {
