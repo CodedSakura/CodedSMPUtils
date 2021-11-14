@@ -114,6 +114,12 @@ pvp.change.one.off=[light_purple]You have [gold]disabled[/gold] PvP!
 pvp.change.all.on=[light_purple]You have [gold]enabled[/gold] PvP for all selected players!
 pvp.change.all.off=[light_purple]You have [gold]disabled[/gold] PvP for all selected players!
 
+bottle.levels-to-points=[light_purple]To get from [aqua]0[/aqua] to [aqua]{$levels}[/aqua] levels, you need a total of [gold]{$points}[/gold] points  
+bottle.insufficient.levels=[red]You don't have enough levels!
+bottle.insufficient.points=[red]You don't have enough points!
+bottle.title=[yellow]Bottled Experience
+bottle.description.line-1=[gray]Stored points: [gold]{$points}[/gold]
+bottle.description.line-2=[gray]Your current points: [gold]{$current_points}[/gold]
 bottle=
 
 afk=

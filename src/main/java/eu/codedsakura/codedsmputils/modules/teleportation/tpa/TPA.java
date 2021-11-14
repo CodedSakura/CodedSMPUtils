@@ -215,7 +215,7 @@ public class TPA {
                         }
                     }
                     if (CONFIG.teleportation.tpa.allowBack) Back.addNewTeleport(tr.tFrom);
-                    tr.tFrom.teleport(tr.tTo.getServerWorld(), tr.tTo.getX(), tr.tTo.getY(), tr.tTo.getZ(), tr.tTo.getYaw(), tr.tTo.getPitch());
+                    tr.tFrom.teleport(tr.tTo.getWorld(), tr.tTo.getX(), tr.tTo.getY(), tr.tTo.getZ(), tr.tTo.getYaw(), tr.tTo.getPitch());
                     switch (CONFIG.teleportation.tpa.cooldownMode) {
                         case BothUsers:
                             CooldownManager.addCooldown(TPA.class, tr.tFrom.getUuid(), CONFIG.teleportation.tpa.cooldown);

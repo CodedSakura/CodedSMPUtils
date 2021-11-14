@@ -6,6 +6,7 @@ import eu.codedsakura.codedsmputils.config.CodedSMPUtilsConfig;
 import eu.codedsakura.codedsmputils.config.elements.teleportation.homes.AutoStage;
 import eu.codedsakura.codedsmputils.config.elements.teleportation.homes.Stage;
 import eu.codedsakura.codedsmputils.locales.LocaleManager;
+import eu.codedsakura.codedsmputils.modules.bottle.Bottle;
 import eu.codedsakura.codedsmputils.modules.pvp.PVP;
 import eu.codedsakura.codedsmputils.modules.teleportation.CooldownManager;
 import eu.codedsakura.codedsmputils.modules.teleportation.back.Back;
@@ -83,7 +84,7 @@ public class CodedSMPUtils implements ModInitializer {
 //                .build();
 
 
-        // TODO /bottle, /afk
+        // TODO /afk, /votecommand
         // CONSIDER /trade, pet transfer to other player /disown?
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
@@ -120,6 +121,7 @@ public class CodedSMPUtils implements ModInitializer {
             new RTP(dispatcher);
             new LastDeath(dispatcher);
             new Spawn(dispatcher);
+            new Bottle(dispatcher);
         });
     }
 

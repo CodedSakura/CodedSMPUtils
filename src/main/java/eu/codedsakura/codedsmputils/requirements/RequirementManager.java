@@ -98,7 +98,7 @@ public class RequirementManager {
                 xp.fulfilled = player.experienceLevel >= xp.value;
                 break;
             case POINTS:
-                xp.fulfilled = ExperienceUtils.xpToLevel(player.experienceLevel) +
+                xp.fulfilled = ExperienceUtils.levelToTotalPoints(player.experienceLevel) +
                         (long) (player.experienceProgress * player.getNextLevelExperience()) >= xp.value;
                 break;
         }

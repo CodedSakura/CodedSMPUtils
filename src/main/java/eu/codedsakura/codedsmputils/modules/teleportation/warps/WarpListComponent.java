@@ -24,7 +24,7 @@ public class WarpListComponent extends PersistentState {
             backwardsWorlds.add(world);
             try {
                 NbtCompound nbt = world.getPersistentStateManager().readNbt("cardinal_world_components",
-                        SharedConstants.getGameVersion().getWorldVersion());
+                        SharedConstants.getGameVersion().getSaveVersion().getId());
                 if (nbt != null) {
                     backwards = WarpListComponent.readBackwardsNbt(nbt.getCompound("data"));
                 }

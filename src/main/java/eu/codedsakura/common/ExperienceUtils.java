@@ -1,5 +1,7 @@
 package eu.codedsakura.common;
 
+import net.minecraft.entity.player.PlayerEntity;
+
 public class ExperienceUtils {
     public enum Type { LEVELS, POINTS }
 
@@ -12,7 +14,7 @@ public class ExperienceUtils {
         return new Pair<>(t, Integer.parseInt(text));
     }
 
-    public static long xpToLevel(long n) {
+    public static long levelToTotalPoints(long n) {
         if (n < 15) {
             return n * n + n * 6;
         } else if (n < 30) {
@@ -20,5 +22,9 @@ public class ExperienceUtils {
         } else {
             return ((9 * n * n - 325 * n) >> 1) + 2220;
         }
+    }
+
+    public static long playerXPToPoints(PlayerEntity player) {
+        return levelToTotalPoints(player.experienceLevel) + (int)(player.experienceProgress * player.getNextLevelExperience());
     }
 }

@@ -46,7 +46,7 @@ Deeper look into the config at https://github.com/CodedSakura/CodedSMPUtils/wiki
 
     <PVP default-state="off" stand-still="3" cooldown="20"/>
 
-    <Bottle max-bottle="50L" min-bottle="500" cooldown="0"/>
+    <Bottle max-bottle="50L" min-bottle="50" cooldown="0"/>
 
     <AFK time="300"/>
 

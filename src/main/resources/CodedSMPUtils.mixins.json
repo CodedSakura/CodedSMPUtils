@@ -5,10 +5,11 @@
   "compatibilityLevel": "JAVA_8",
   "plugin": "eu.codedsakura.codedsmputils.mixin.MixinConfigPlugin",
   "mixins": [
-    "DeathMixin",
+    "ServerPlayerEntityMixin",
     "PlayerNBTMixin",
     "PVPMixin",
     "TPMixin",
+    "XPBottleMixin",
     "nomobgrief.CreeperExplosionMixin",
     "nomobgrief.EndermanBlockPickupMixin",
     "nomobgrief.FireballExplosionMixin",

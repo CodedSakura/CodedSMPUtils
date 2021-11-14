@@ -34,7 +34,7 @@ public class RTP {
 
     private boolean checkIfDimAllowed(ServerCommandSource source) {
         try {
-            String playerDim = source.getPlayer().getServerWorld().getRegistryKey().getValue().toString();
+            String playerDim = source.getPlayer().getWorld().getRegistryKey().getValue().toString();
             logger.info(playerDim);
             if (CONFIG.teleportation.rtp.blacklistDims != null) {
                 if (Arrays.stream(CONFIG.teleportation.rtp.blacklistDims.split(",")).anyMatch(s -> s.equalsIgnoreCase(playerDim))) {
